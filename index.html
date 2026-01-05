@@ -279,41 +279,7 @@
     .menuItem:last-child{ margin-bottom:0; }
     .badge{ font-size: 12px; color: var(--muted); }
 
-    /* ===== Confirm Modal ===== */
-    .confirmOverlay{
-      position: fixed;
-      inset: 0;
-      display:none;
-      z-index: 80;
-      background: rgba(0,0,0,.45);
-      backdrop-filter: blur(6px);
-    }
-    .confirmOverlay.show{ display:block; }
-
-    .confirmBox{
-      position: fixed;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      width: min(380px, calc(100vw - 28px));
-      background: rgba(23,26,33,.94);
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 16px;
-      box-shadow: 0 20px 60px rgba(0,0,0,.55);
-      padding: 12px;
-    }
-    .confirmMsg{
-      font-size: 14px;
-      line-height: 1.5;
-      margin-bottom: 12px;
-      color: rgba(232,236,243,.95);
-      white-space: pre-wrap;
-    }
-    .confirmBtns{
-      display:flex;
-      gap: 10px;
-      justify-content:flex-end;
-    }
+    /* ===== generic buttons ===== */
     .btn{
       border: 1px solid rgba(255,255,255,.12);
       background: rgba(255,255,255,.06);
@@ -328,6 +294,10 @@
     .btn.primary{
       border-color: rgba(255,255,255,.18);
       background: rgba(255,255,255,.10);
+    }
+    .btn.danger{
+      border-color: rgba(255,140,140,.25);
+      background: rgba(255,120,120,.12);
     }
 
     /* ===== 日記（単日） ===== */
@@ -386,6 +356,28 @@
     }
     .iconBtn:active{ transform: translateY(1px); }
     .iconBtn svg{ width: 18px; height: 18px; opacity:.9; }
+
+    /* 日記枠内確認（画面全体を覆わない） */
+    .inlineConfirm{
+      display:none;
+      margin: 6px 0 10px;
+      padding: 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
+    }
+    .inlineConfirm.show{ display:block; }
+    .inlineConfirmMsg{
+      font-size: 13px;
+      color: rgba(232,236,243,.95);
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+    .inlineConfirmBtns{
+      display:flex;
+      gap: 10px;
+      justify-content:flex-end;
+    }
 
     .section{
       margin-top: 12px;
@@ -560,12 +552,26 @@
 
     .dataHead{
       display:flex;
-      align-items:center;
+      align-items:flex-start;
       justify-content:space-between;
       gap: 10px;
       margin-bottom: 10px;
     }
-    .dataTitle{ font-size: 14px; color: var(--muted); }
+    .dataHeadLeft{
+      display:flex;
+      flex-direction:column;
+      gap: 4px;
+    }
+    .dataMonthBig{
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: .02em;
+      line-height: 1.2;
+    }
+    .dataSub{
+      font-size: 12px;
+      color: var(--muted);
+    }
 
     .row{
       display:flex;
@@ -578,7 +584,7 @@
     }
     .row:first-of-type{ border-top:none; padding-top:0; }
     .rowLabel{
-      min-width: 140px;
+      min-width: 180px;
       font-size: 13px;
       color: rgba(232,236,243,.92);
     }
@@ -601,6 +607,16 @@
     input[type="file"]{
       color: var(--muted);
       font-size: 12px;
+    }
+
+    .divider{
+      margin: 14px 0;
+      border-top: 1px solid rgba(255,255,255,.08);
+    }
+    .sectionTag{
+      font-size: 12px;
+      color: var(--muted);
+      margin: 0 0 6px;
     }
 
     @media (max-width: 360px){
@@ -662,6 +678,15 @@
       </button>
     </div>
 
+    <!-- 日記枠内だけの確認 -->
+    <div class="inlineConfirm" id="inlineConfirm">
+      <div class="inlineConfirmMsg" id="inlineConfirmMsg">この日のデータを削除しますか？</div>
+      <div class="inlineConfirmBtns">
+        <button class="btn" id="inlineNo" type="button">いいえ</button>
+        <button class="btn danger" id="inlineYes" type="button">はい</button>
+      </div>
+    </div>
+
     <div class="section">
       <div class="sectionHead">
         <div class="sectionTitle">① 今日の目標</div>
@@ -699,19 +724,24 @@
   <!-- データ管理 -->
   <section class="data" id="data">
     <div class="dataHead">
-      <div class="dataTitle">データ管理</div>
-      <div class="badge" id="dataBadge"></div>
+      <div class="dataHeadLeft">
+        <div class="dataMonthBig" id="dataMonthBig">2026年1月</div>
+        <div class="dataSub" id="dataMonthCount">今月の記録日数 0/31日</div>
+      </div>
+      <div class="badge" style="opacity:.85;">2026年のみ</div>
     </div>
 
+    <div class="sectionTag">今月のデータ管理</div>
+
     <div class="row">
-      <div class="rowLabel">① 今月リセット</div>
+      <div class="rowLabel">今月リセット</div>
       <div class="controls">
-        <button class="btn primary" id="resetMonthInData" type="button">今月を削除</button>
+        <button class="btn danger" id="resetMonthInData" type="button">今月を削除</button>
       </div>
     </div>
 
     <div class="row">
-      <div class="rowLabel">② データ書き出し</div>
+      <div class="rowLabel">データ書き出し（1ヶ月）</div>
       <div class="controls">
         <select id="exportMonthSelect" aria-label="書き出し月">
           <option value="1">1月</option><option value="2">2月</option><option value="3">3月</option>
@@ -724,15 +754,53 @@
     </div>
 
     <div class="row">
-      <div class="rowLabel">③ データ読み込み</div>
+      <div class="rowLabel">データ読み込み（1ヶ月上書き）</div>
       <div class="controls">
         <input type="file" id="importFile" accept="application/json,.json" />
         <button class="btn" id="importBtn" type="button">読み込む</button>
       </div>
     </div>
 
+    <div class="divider"></div>
+
+    <div class="sectionTag">全体データ管理（2026年）</div>
+
+    <div class="row">
+      <div class="rowLabel">すべての月をリセット</div>
+      <div class="controls">
+        <button class="btn danger" id="resetAllBtn" type="button">全月を削除</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="rowLabel">選択期間内のデータ一括書き出し</div>
+      <div class="controls">
+        <select id="bulkFrom" aria-label="開始月">
+          <option value="1">1月</option><option value="2">2月</option><option value="3">3月</option>
+          <option value="4">4月</option><option value="5">5月</option><option value="6">6月</option>
+          <option value="7">7月</option><option value="8">8月</option><option value="9">9月</option>
+          <option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
+        </select>
+        <select id="bulkTo" aria-label="終了月">
+          <option value="1">1月</option><option value="2">2月</option><option value="3">3月</option>
+          <option value="4">4月</option><option value="5">5月</option><option value="6">6月</option>
+          <option value="7">7月</option><option value="8">8月</option><option value="9">9月</option>
+          <option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
+        </select>
+        <button class="btn" id="bulkExportBtn" type="button">一括書き出し</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="rowLabel">データ一括読み込み（ある月のみ上書き）</div>
+      <div class="controls">
+        <input type="file" id="bulkImportFile" accept="application/json,.json" />
+        <button class="btn" id="bulkImportBtn" type="button">一括読み込み</button>
+      </div>
+    </div>
+
     <div class="hint">
-      書き出しは JSON。読み込みは「月ごとに上書き」。
+      一括は JSON。読み込みは「データが入っている月だけ上書き」して、他の月は触らない。
     </div>
   </section>
 </main>
@@ -759,27 +827,15 @@
   </button>
 </div>
 
-<!-- Confirm -->
-<div class="confirmOverlay" id="confirmOverlay" aria-hidden="true">
-  <div class="confirmBox" role="dialog" aria-label="確認">
-    <div class="confirmMsg" id="confirmMsg"></div>
-    <div class="confirmBtns">
-      <button class="btn" id="confirmNo" type="button">いいえ</button>
-      <button class="btn primary" id="confirmYes" type="button">はい</button>
-    </div>
-  </div>
-</div>
-
 <script>
 (() => {
-  // ===== constants =====
   const YEAR = 2026;
   const MIN_MONTH = 1;
   const MAX_MONTH = 12;
   const COLORS = ["pink","yellow","blue"];
-  const APP_VERSION = "1.0.0";
+  const APP_VERSION = "1.1.0";
 
-  // ===== elements =====
+  // elements
   const monthTitleEl = document.getElementById("monthTitle");
   const prevMonthBtn = document.getElementById("prevMonth");
   const nextMonthBtn = document.getElementById("nextMonth");
@@ -795,17 +851,31 @@
   const todoListEl = document.getElementById("todoList");
   const addTodoBtn = document.getElementById("addTodo");
 
+  const inlineConfirm = document.getElementById("inlineConfirm");
+  const inlineMsg = document.getElementById("inlineConfirmMsg");
+  const inlineYes = document.getElementById("inlineYes");
+  const inlineNo = document.getElementById("inlineNo");
+
   const listEl = document.getElementById("list");
   const listBodyEl = document.getElementById("listBody");
   const listBadgeEl = document.getElementById("listBadge");
 
   const dataEl = document.getElementById("data");
-  const dataBadgeEl = document.getElementById("dataBadge");
+  const dataMonthBig = document.getElementById("dataMonthBig");
+  const dataMonthCount = document.getElementById("dataMonthCount");
+
   const resetMonthInDataBtn = document.getElementById("resetMonthInData");
   const exportMonthSelect = document.getElementById("exportMonthSelect");
   const exportBtn = document.getElementById("exportBtn");
   const importFile = document.getElementById("importFile");
   const importBtn = document.getElementById("importBtn");
+
+  const resetAllBtn = document.getElementById("resetAllBtn");
+  const bulkFrom = document.getElementById("bulkFrom");
+  const bulkTo = document.getElementById("bulkTo");
+  const bulkExportBtn = document.getElementById("bulkExportBtn");
+  const bulkImportFile = document.getElementById("bulkImportFile");
+  const bulkImportBtn = document.getElementById("bulkImportBtn");
 
   const pickerEl = document.getElementById("picker");
   const caretEl = document.getElementById("caret");
@@ -817,35 +887,7 @@
   const menuListBtn = document.getElementById("menuList");
   const menuDataBtn = document.getElementById("menuData");
 
-  const confirmOverlay = document.getElementById("confirmOverlay");
-  const confirmMsgEl = document.getElementById("confirmMsg");
-  const confirmYesBtn = document.getElementById("confirmYes");
-  const confirmNoBtn = document.getElementById("confirmNo");
-
-  // ===== confirm helper =====
-  let confirmYesHandler = null;
-  function showConfirm(message, onYes){
-    confirmMsgEl.textContent = message;
-    confirmYesHandler = onYes;
-    confirmOverlay.classList.add("show");
-    confirmOverlay.setAttribute("aria-hidden","false");
-  }
-  function hideConfirm(){
-    confirmOverlay.classList.remove("show");
-    confirmOverlay.setAttribute("aria-hidden","true");
-    confirmYesHandler = null;
-  }
-  confirmNoBtn.addEventListener("click", hideConfirm);
-  confirmYesBtn.addEventListener("click", () => {
-    const fn = confirmYesHandler;
-    hideConfirm();
-    try { fn && fn(); } catch {}
-  });
-  confirmOverlay.addEventListener("click", (e) => {
-    if (e.target === confirmOverlay) hideConfirm();
-  });
-
-  // ===== storage per month =====
+  // storage
   function storageKey(month){
     return `sticker-cal:${YEAR}-${String(month).padStart(2,'0')}`;
   }
@@ -853,32 +895,27 @@
     try { return JSON.parse(localStorage.getItem(storageKey(month)) || "{}"); }
     catch { return {}; }
   }
-  function saveStateForMonth(month, stateObj){
-    localStorage.setItem(storageKey(month), JSON.stringify(stateObj));
+  function saveStateForMonth(month, obj){
+    localStorage.setItem(storageKey(month), JSON.stringify(obj));
   }
 
-  // ===== state =====
+  // state
   let currentMonth = 1;
   let state = loadStateForMonth(currentMonth);
-
-  // date selection in current month only
-  let selectedDate = null;        // "YYYY-MM-DD"
+  let selectedDate = null;
   let pickerDate = null;
-  let pickerSource = null;        // "calendar" | "diary"
-  let viewMode = "calendar";      // "calendar" | "list" | "data"
+  let pickerSource = null;
+  let viewMode = "calendar"; // calendar | list | data
 
   function uid(){
     return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`;
   }
-
   function daysInMonthOf(month){
     return new Date(YEAR, month, 0).getDate();
   }
-
   function ymd(month, day){
     return `${YEAR}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
   }
-
   function ensureDay(dateKey){
     if (!state[dateKey]) state[dateKey] = { stamp: null, diary: { goal:"", todos: [], memo:"" } };
     if (!state[dateKey].diary) state[dateKey].diary = { goal:"", todos: [], memo:"" };
@@ -902,17 +939,18 @@
       }));
     }
   }
-
   function persist(){
     saveStateForMonth(currentMonth, state);
   }
 
-  // ===== view switching =====
+  // view
   function setView(mode){
     viewMode = mode;
     diaryEl.classList.remove("show");
     listEl.classList.remove("show");
     dataEl.classList.remove("show");
+
+    hideInlineConfirm();
 
     if (mode === "calendar"){
       if (selectedDate) diaryEl.classList.add("show");
@@ -921,22 +959,23 @@
       renderList();
     } else if (mode === "data"){
       dataEl.classList.add("show");
-      updateDataBadge();
       exportMonthSelect.value = String(currentMonth);
+      bulkFrom.value = String(currentMonth);
+      bulkTo.value = String(currentMonth);
+      updateDataHeader();
     }
   }
 
-  // ===== month UI =====
+  // month header
   function updateMonthHeader(){
     monthTitleEl.textContent = `${YEAR}年${currentMonth}月`;
     prevMonthBtn.disabled = currentMonth <= MIN_MONTH;
     nextMonthBtn.disabled = currentMonth >= MAX_MONTH;
   }
-
   function changeMonth(nextMonth){
     if (nextMonth < MIN_MONTH || nextMonth > MAX_MONTH) return;
-
     hidePicker();
+    hideInlineConfirm();
     selectedDate = null;
     setView("calendar");
 
@@ -945,21 +984,39 @@
 
     updateMonthHeader();
     renderCalendar();
-    // diary/list/data are hidden unless user opens again
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
-
   prevMonthBtn.addEventListener("click", () => changeMonth(currentMonth - 1));
   nextMonthBtn.addEventListener("click", () => changeMonth(currentMonth + 1));
 
-  // ===== picker =====
+  // menu
+  function closeMenu(){
+    menuOverlay.classList.remove("show");
+    menuSheet.classList.remove("show");
+  }
+  function openMenu(){
+    menuOverlay.classList.add("show");
+    menuSheet.classList.add("show");
+  }
+  hamburgerBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (menuSheet.classList.contains("show")) closeMenu();
+    else openMenu();
+  });
+  menuOverlay.addEventListener("click", closeMenu);
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeMenu(); });
+
+  menuCalendarBtn.addEventListener("click", () => { closeMenu(); setView("calendar"); });
+  menuListBtn.addEventListener("click", () => { closeMenu(); setView("list"); });
+  menuDataBtn.addEventListener("click", () => { closeMenu(); setView("data"); });
+
+  // picker
   function hidePicker(){
     pickerEl.classList.remove("show");
     caretEl.classList.remove("show");
     pickerDate = null;
     pickerSource = null;
   }
-
   function showPickerNear(el, dateKey, source){
     pickerDate = dateKey;
     pickerSource = source;
@@ -993,18 +1050,12 @@
   function setDiaryStampFromDate(dateKey){
     ensureDay(dateKey);
     const stamp = state[dateKey].stamp;
-
     diaryStampEl.className = "diaryStamp";
-    if (COLORS.includes(stamp)){
-      diaryStampEl.classList.add("filled", stamp);
-    }
+    if (COLORS.includes(stamp)) diaryStampEl.classList.add("filled", stamp);
   }
-
   function setMiniStampClass(el, stamp){
     el.className = "miniStamp";
-    if (COLORS.includes(stamp)){
-      el.classList.add("filled", stamp);
-    }
+    if (COLORS.includes(stamp)) el.classList.add("filled", stamp);
   }
 
   function applyStamp(dateKey, colorOrNull){
@@ -1017,17 +1068,14 @@
     if (selectedDate === dateKey){
       setDiaryStampFromDate(dateKey);
     }
-    if (viewMode === "list"){
-      renderList();
-    }
+    if (viewMode === "list") renderList();
   }
 
-  // ピッカー色選択（重要：dateKeyを退避）
   pickerEl.addEventListener("click", (e) => {
     const b = e.target.closest("button[data-color]");
     if (!b || !pickerDate) return;
 
-    const dateKey = pickerDate;             // ★退避
+    const dateKey = pickerDate; // 退避
     const color = b.getAttribute("data-color");
 
     ensureDay(dateKey);
@@ -1037,50 +1085,15 @@
     applyStamp(dateKey, next);
   });
 
-  // 外タップで閉じる
   document.addEventListener("pointerdown", (e) => {
     const inPicker = e.target.closest("#picker");
     const isDot = e.target.closest(".dot") || e.target.closest("#diaryStamp");
     if (!inPicker && !isDot) hidePicker();
   });
 
-  // ===== menu =====
-  function closeMenu(){
-    menuOverlay.classList.remove("show");
-    menuSheet.classList.remove("show");
-  }
-  function openMenu(){
-    menuOverlay.classList.add("show");
-    menuSheet.classList.add("show");
-  }
-
-  hamburgerBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    if (menuSheet.classList.contains("show")) closeMenu();
-    else openMenu();
-  });
-  menuOverlay.addEventListener("click", closeMenu);
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeMenu();
-  });
-
-  menuCalendarBtn.addEventListener("click", () => {
-    closeMenu();
-    setView("calendar");
-  });
-  menuListBtn.addEventListener("click", () => {
-    closeMenu();
-    setView("list");
-  });
-  menuDataBtn.addEventListener("click", () => {
-    closeMenu();
-    setView("data");
-  });
-
-  // ===== calendar render =====
+  // calendar render
   function renderCalendar(){
     daysEl.innerHTML = "";
-
     const first = new Date(YEAR, currentMonth - 1, 1);
     const last = new Date(YEAR, currentMonth, 0);
     const firstDow = first.getDay();
@@ -1116,9 +1129,7 @@
         dot.setAttribute("aria-label", `${key} スタンプ`);
 
         const stamp = state[key].stamp;
-        if (COLORS.includes(stamp)){
-          dot.classList.add("filled", stamp);
-        }
+        if (COLORS.includes(stamp)) dot.classList.add("filled", stamp);
 
         dot.addEventListener("click", (e) => {
           e.stopPropagation();
@@ -1136,7 +1147,7 @@
     }
   }
 
-  // ===== diary =====
+  // diary
   function openDiary(dateKey){
     selectedDate = dateKey;
     ensureDay(dateKey);
@@ -1153,6 +1164,7 @@
     renderTodos(dateKey);
 
     renderCalendar();
+    hideInlineConfirm();
   }
 
   function renderTodos(dateKey){
@@ -1192,6 +1204,7 @@
         item.done = chk.checked;
         persist();
         if (viewMode === "list") renderList();
+        if (viewMode === "data") updateDataHeader();
       });
 
       txt.addEventListener("input", () => {
@@ -1202,6 +1215,7 @@
         item.text = txt.value || "";
         persist();
         if (viewMode === "list") renderList();
+        if (viewMode === "data") updateDataHeader();
       });
 
       del.addEventListener("click", () => {
@@ -1214,6 +1228,7 @@
         persist();
         renderTodos(selectedDate);
         if (viewMode === "list") renderList();
+        if (viewMode === "data") updateDataHeader();
       });
 
       row.appendChild(chk);
@@ -1229,6 +1244,7 @@
     state[selectedDate].diary.goal = goalInput.value || "";
     persist();
     if (viewMode === "list") renderList();
+    if (viewMode === "data") updateDataHeader();
   });
 
   memoInput.addEventListener("input", () => {
@@ -1237,6 +1253,7 @@
     state[selectedDate].diary.memo = memoInput.value || "";
     persist();
     if (viewMode === "list") renderList();
+    if (viewMode === "data") updateDataHeader();
   });
 
   addTodoBtn.addEventListener("click", () => {
@@ -1246,10 +1263,11 @@
     persist();
     renderTodos(selectedDate);
     if (viewMode === "list") renderList();
+    if (viewMode === "data") updateDataHeader();
     todoListEl.lastElementChild?.querySelector("input.todoText")?.focus();
   });
 
-  // 日記ヘッダの丸 → 色変更
+  // diary stamp
   diaryStampEl.addEventListener("click", (e) => {
     if (!selectedDate) return;
     e.stopPropagation();
@@ -1260,22 +1278,37 @@
     }
   });
 
-  // ゴミ箱（確認つき）
+  // inline confirm for delete-day
+  function showInlineConfirm(){
+    inlineMsg.textContent = "この日のデータを削除しますか？";
+    inlineConfirm.classList.add("show");
+  }
+  function hideInlineConfirm(){
+    inlineConfirm.classList.remove("show");
+  }
+
   deleteDayBtn.addEventListener("click", () => {
     if (!selectedDate) return;
-    const key = selectedDate;
-    showConfirm("本当に削除しますか？", () => {
-      delete state[key];
-      persist();
-      // 削除後は日記を閉じる
-      selectedDate = null;
-      diaryEl.classList.remove("show");
-      renderCalendar();
-      if (viewMode === "list") renderList();
-    });
+    // “全体を消しそう”を避けるため、日記枠内だけに出す
+    if (inlineConfirm.classList.contains("show")) hideInlineConfirm();
+    else showInlineConfirm();
   });
 
-  // ===== list =====
+  inlineNo.addEventListener("click", hideInlineConfirm);
+  inlineYes.addEventListener("click", () => {
+    if (!selectedDate) return;
+    const key = selectedDate;
+    delete state[key];
+    persist();
+    selectedDate = null;
+    diaryEl.classList.remove("show");
+    hideInlineConfirm();
+    renderCalendar();
+    if (viewMode === "list") renderList();
+    if (viewMode === "data") updateDataHeader();
+  });
+
+  // list
   function escapePreview(s){ return (s || "").slice(0, 160); }
 
   function renderList(){
@@ -1323,6 +1356,7 @@
       const d = state[key].diary;
 
       const hasAny =
+        (state[key].stamp) ||
         (d.goal && d.goal.trim()) ||
         (d.memo && d.memo.trim()) ||
         (d.todos && d.todos.some(t => (t.text||"").trim() || t.done));
@@ -1351,14 +1385,14 @@
     listBadgeEl.textContent = `${filledCount}/${dim} 日 記入あり`;
   }
 
-  // ===== data management =====
-  function updateDataBadge(){
-    // 現在月のデータ件数
-    const dim = daysInMonthOf(currentMonth);
+  // data header
+  function countRecordedDaysForMonth(month){
+    const dim = daysInMonthOf(month);
+    const st = (month === currentMonth) ? state : loadStateForMonth(month);
     let used = 0;
     for (let day=1; day<=dim; day++){
-      const key = ymd(currentMonth, day);
-      const it = state[key];
+      const key = ymd(month, day);
+      const it = st[key];
       if (!it) continue;
       const d = it.diary || {};
       const hasAny =
@@ -1368,24 +1402,35 @@
         (Array.isArray(d.todos) && d.todos.some(t => (t.text||"").trim() || t.done));
       if (hasAny) used++;
     }
-    dataBadgeEl.textContent = `今月: ${used}/${dim} 日`;
+    return { used, dim };
   }
 
-  // 今月リセット（確認つき）
+  function updateDataHeader(){
+    dataMonthBig.textContent = `${YEAR}年${currentMonth}月`;
+    const { used, dim } = countRecordedDaysForMonth(currentMonth);
+    dataMonthCount.textContent = `今月の記録日数 ${used}/${dim}日`;
+  }
+
+  // simple confirm (native)
+  function okConfirm(msg){
+    return window.confirm(msg);
+  }
+
+  // month reset
   resetMonthInDataBtn.addEventListener("click", () => {
-    showConfirm("本当に削除しますか？\n（今月のデータがすべて消えます）", () => {
-      state = {};
-      persist();
-      selectedDate = null;
-      diaryEl.classList.remove("show");
-      hidePicker();
-      renderCalendar();
-      if (viewMode === "list") renderList();
-      updateDataBadge();
-    });
+    if (!okConfirm("本当に削除しますか？\n（今月のデータがすべて消えます）")) return;
+    state = {};
+    persist();
+    selectedDate = null;
+    diaryEl.classList.remove("show");
+    hidePicker();
+    hideInlineConfirm();
+    renderCalendar();
+    if (viewMode === "list") renderList();
+    updateDataHeader();
   });
 
-  // 書き出し
+  // export 1 month
   exportBtn.addEventListener("click", () => {
     const m = Number(exportMonthSelect.value || currentMonth);
     const exportState = loadStateForMonth(m);
@@ -1393,9 +1438,9 @@
     const payload = {
       app: "StickerCalendar",
       version: APP_VERSION,
+      type: "single",
       year: YEAR,
       month: m,
-      storageKey: storageKey(m),
       exportedAt: new Date().toISOString(),
       data: exportState
     };
@@ -1413,7 +1458,7 @@
     URL.revokeObjectURL(url);
   });
 
-  // 読み込み（確認つき）
+  // import 1 month overwrite (confirmed)
   importBtn.addEventListener("click", async () => {
     const file = importFile.files && importFile.files[0];
     if (!file) return;
@@ -1424,36 +1469,127 @@
     let payload = null;
     try { payload = JSON.parse(text); } catch { return; }
 
-    // payload.data が無い場合は、ファイル全体をデータとして扱う（雑に救う）
     const monthFromFile = Number(payload?.month);
     const targetMonth =
       (monthFromFile >= MIN_MONTH && monthFromFile <= MAX_MONTH) ? monthFromFile : currentMonth;
 
-    const incoming = (payload && typeof payload === "object" && payload.data && typeof payload.data === "object")
-      ? payload.data
-      : (payload && typeof payload === "object" ? payload : {});
+    const incoming =
+      (payload && typeof payload === "object" && payload.data && typeof payload.data === "object")
+        ? payload.data
+        : (payload && typeof payload === "object" ? payload : {});
 
-    showConfirm(
-      "いま保存されているデータは消え、上書きされますがよろしいですか？\n（読み込み対象："
-      + `${YEAR}年${targetMonth}月）`,
-      () => {
-        saveStateForMonth(targetMonth, incoming);
+    if (!okConfirm("いま保存されているデータは消え、上書きされますがよろしいですか？\n（読み込み対象：" + `${YEAR}年${targetMonth}月）`)) return;
 
-        // いま表示中の月なら即反映
-        if (targetMonth === currentMonth){
-          state = loadStateForMonth(currentMonth);
-          selectedDate = null;
-          diaryEl.classList.remove("show");
-          hidePicker();
-          renderCalendar();
-          if (viewMode === "list") renderList();
-          if (viewMode === "data") updateDataBadge();
-        }
-      }
-    );
+    saveStateForMonth(targetMonth, incoming);
+
+    if (targetMonth === currentMonth){
+      state = loadStateForMonth(currentMonth);
+      selectedDate = null;
+      diaryEl.classList.remove("show");
+      hidePicker();
+      hideInlineConfirm();
+      renderCalendar();
+      if (viewMode === "list") renderList();
+      updateDataHeader();
+    }
   });
 
-  // ===== init =====
+  // reset all months
+  resetAllBtn.addEventListener("click", () => {
+    if (!okConfirm("本当に削除しますか？\n（2026年の全月データが消えます）")) return;
+    for (let m=MIN_MONTH; m<=MAX_MONTH; m++){
+      localStorage.removeItem(storageKey(m));
+    }
+    // refresh current
+    state = loadStateForMonth(currentMonth);
+    selectedDate = null;
+    diaryEl.classList.remove("show");
+    hidePicker();
+    hideInlineConfirm();
+    renderCalendar();
+    if (viewMode === "list") renderList();
+    updateDataHeader();
+  });
+
+  // bulk export range
+  function clampRange(a,b){
+    const from = Math.max(MIN_MONTH, Math.min(MAX_MONTH, a));
+    const to = Math.max(MIN_MONTH, Math.min(MAX_MONTH, b));
+    return (from <= to) ? { from, to } : { from: to, to: from };
+  }
+
+  bulkExportBtn.addEventListener("click", () => {
+    const r = clampRange(Number(bulkFrom.value), Number(bulkTo.value));
+    const months = {};
+    for (let m=r.from; m<=r.to; m++){
+      months[String(m).padStart(2,'0')] = loadStateForMonth(m);
+    }
+
+    const payload = {
+      app: "StickerCalendar",
+      version: APP_VERSION,
+      type: "bulk",
+      year: YEAR,
+      fromMonth: r.from,
+      toMonth: r.to,
+      exportedAt: new Date().toISOString(),
+      months
+    };
+
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `sticker-calendar-${YEAR}-${String(r.from).padStart(2,'0')}-${String(r.to).padStart(2,'0')}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    URL.revokeObjectURL(url);
+  });
+
+  // bulk import: overwrite only months that exist in file
+  bulkImportBtn.addEventListener("click", async () => {
+    const file = bulkImportFile.files && bulkImportFile.files[0];
+    if (!file) return;
+
+    let text = "";
+    try { text = await file.text(); } catch { return; }
+
+    let payload = null;
+    try { payload = JSON.parse(text); } catch { return; }
+
+    const monthsObj = payload?.months && typeof payload.months === "object" ? payload.months : null;
+    if (!monthsObj){
+      // fallback: if it's a single payload, treat as single import
+      return;
+    }
+
+    if (!okConfirm("一括読み込みを実行しますか？\n（データがある月のみ上書きされます）")) return;
+
+    for (let m=MIN_MONTH; m<=MAX_MONTH; m++){
+      const key = String(m).padStart(2,'0');
+      if (Object.prototype.hasOwnProperty.call(monthsObj, key)){
+        const incoming = monthsObj[key];
+        if (incoming && typeof incoming === "object"){
+          saveStateForMonth(m, incoming);
+        }
+      }
+    }
+
+    // refresh current month view
+    state = loadStateForMonth(currentMonth);
+    selectedDate = null;
+    diaryEl.classList.remove("show");
+    hidePicker();
+    hideInlineConfirm();
+    renderCalendar();
+    if (viewMode === "list") renderList();
+    updateDataHeader();
+  });
+
+  // init
   updateMonthHeader();
   renderCalendar();
 })();
