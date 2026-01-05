@@ -1413,7 +1413,7 @@
       if (selectedDate){
         diaryWrap.style.display = "";
         diaryPanel.classList.add("show");
-        customPanel.classList.add("show");
+        customPanel.classList.remove("show"); // 普段は出さない
       } else {
         diaryWrap.style.display = "none";
       }
@@ -2424,5 +2424,6 @@
 </script>
 </body>
 </html>
+
 
 
