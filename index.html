@@ -15,7 +15,6 @@
       --shadow: 0 12px 30px rgba(0,0,0,.35);
       --ring: rgba(255,255,255,.16);
 
-      /* default theme stamp colors (5) */
       --pink:#ff6fae;
       --orange:#ff9a4a;
       --yellow:#ffd55a;
@@ -160,8 +159,6 @@
       cursor: pointer;
       overflow: hidden;
       user-select: none;
-
-      /* desktop default height */
       height: 86px;
     }
     .cell.empty{
@@ -179,7 +176,6 @@
       line-height: 1;
     }
 
-    /* goal preview: desktop only (see media query below) */
     .goalPreview{
       margin-top: 6px;
       font-size: 12px;
@@ -187,12 +183,11 @@
       letter-spacing: .01em;
       color: rgba(232,236,243,.92);
       padding-right: 30px;
-
-      display: none; /* default hidden; will enable on wide screens */
+      display: none;
     }
     .goalPreview.show{
       display: -webkit-box;
-      -webkit-line-clamp: 2;          /* max 2 lines */
+      -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
@@ -222,20 +217,43 @@
     .dot.green{ background: var(--green); }
     .dot.blue{ background: var(--blue); }
 
-    /* ===== color picker popup (now 5) ===== */
+    /* ===== color picker popup (with title) ===== */
     .picker{
       position: fixed;
       z-index: 9999;
       display: none;
+      flex-direction: column;
       gap: 10px;
-      padding: 10px 12px;
+      padding: 10px 12px 12px;
       border-radius: 14px;
       background: rgba(23,26,33,.92);
       border: 1px solid rgba(255,255,255,.12);
       box-shadow: 0 16px 40px rgba(0,0,0,.45);
       backdrop-filter: blur(10px);
+      min-width: 190px;
     }
     .picker.show{ display:flex; }
+
+    .pickerTitle{
+      font-size: 12px;
+      color: rgba(232,236,243,.9);
+      letter-spacing: .02em;
+      display:flex;
+      align-items:center;
+      gap: 8px;
+    }
+    .pickerTitle .miniDot{
+      width: 10px; height: 10px;
+      border-radius: 999px;
+      border: 2px solid rgba(255,255,255,.22);
+      opacity: .85;
+    }
+
+    .pickerRow{
+      display:flex;
+      gap: 10px;
+      justify-content: space-between;
+    }
 
     .pick{
       width: 22px;
@@ -244,7 +262,7 @@
       border: 2px solid rgba(255,255,255,.22);
       box-shadow: 0 10px 22px rgba(0,0,0,.35);
       cursor: pointer;
-      transition: transform .08s ease;
+      transition: transform .08s ease, opacity .12s ease;
     }
     .pick:active{ transform: translateY(1px) scale(.98); }
     .pick.pink{ background: var(--pink); }
@@ -328,9 +346,22 @@
       background: rgba(255,120,120,.12);
     }
 
-    /* ===== diary ===== */
-    .diary{
+    /* ===== diary + customize wrapper (slide) ===== */
+    .diaryWrap{
+      position: relative;
       margin-top: 12px;
+      border-radius: 16px;
+    }
+    .slider{
+      display:flex;
+      width: 200%;
+      transition: transform .22s ease;
+      will-change: transform;
+    }
+    .slider.customize{ transform: translateX(-50%); }
+
+    .panel{
+      width: 50%;
       background: var(--card);
       border: 1px solid rgba(255,255,255,.06);
       border-radius: 16px;
@@ -338,7 +369,7 @@
       box-shadow: var(--shadow);
       display:none;
     }
-    .diary.show{ display:block; }
+    .panel.show{ display:block; }
 
     .diaryHead{
       display:flex;
@@ -371,6 +402,12 @@
 
     .diaryLabel{ font-size: 12px; color: var(--muted); }
     .diaryDate{ font-size: 16px; font-weight: 700; letter-spacing: .02em; margin-top: 2px; }
+
+    .headBtns{
+      display:flex;
+      gap: 8px;
+      align-items:center;
+    }
 
     .iconBtn{
       width: 38px;
@@ -425,7 +462,15 @@
       gap: 10px;
       margin-bottom: 8px;
     }
-    .sectionTitle{ font-size: 12px; color: var(--muted); }
+    .sectionTitle{ font-size: 12px; color: var(--muted); display:flex; align-items:center; gap:8px; }
+    .chip{
+      font-size: 11px;
+      color: rgba(232,236,243,.9);
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      padding: 4px 8px;
+      border-radius: 999px;
+    }
 
     input.goal{
       width: 100%;
@@ -496,6 +541,47 @@
     textarea.memo:focus{ border-color: rgba(255,255,255,.22); }
 
     .hint{ color: var(--muted); font-size: 12px; margin-top: 10px; line-height: 1.6; }
+
+    /* ===== Mood Widget (Diary) ===== */
+    .moodWidget{
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255,255,255,.06);
+    }
+    .moodTitle{
+      font-size: 12px;
+      color: rgba(232,236,243,.92);
+      letter-spacing: .02em;
+      margin-bottom: 8px;
+      display:flex;
+      align-items:center;
+      gap: 8px;
+    }
+    .moodRow{
+      display:flex;
+      gap: 12px;
+      align-items:center;
+      justify-content: space-between;
+      padding: 8px 0 2px;
+    }
+    .moodPick{
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      border: 2px solid rgba(255,255,255,.22);
+      cursor:pointer;
+      box-shadow: 0 12px 24px rgba(0,0,0,.35);
+      transition: transform .08s ease, opacity .14s ease;
+      background: transparent;
+    }
+    .moodPick:active{ transform: translateY(1px) scale(.98); }
+    .moodPick.pink{ background: var(--pink); }
+    .moodPick.orange{ background: var(--orange); }
+    .moodPick.yellow{ background: var(--yellow); }
+    .moodPick.green{ background: var(--green); }
+    .moodPick.blue{ background: var(--blue); }
+    .moodRow.hasSelection .moodPick{ opacity: .35; }
+    .moodRow.hasSelection .moodPick.isSelected{ opacity: 1; outline: 2px solid rgba(255,255,255,.18); }
 
     /* ===== list ===== */
     .list{
@@ -698,14 +784,147 @@
       border-top: 1px solid rgba(255,255,255,.08);
     }
 
+    /* ===== customize panel ===== */
+    .customHead{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .customTitle{
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: .02em;
+    }
+    .customSub{
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+      line-height: 1.6;
+    }
+
+    .blockList{
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .blockCard{
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.14);
+      padding: 10px;
+    }
+    .blockTop{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+    }
+    .blockName{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      min-width: 0;
+    }
+    .blockName strong{
+      font-size: 13px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display:block;
+      max-width: 240px;
+    }
+    .lockTag{
+      font-size: 11px;
+      color: rgba(232,236,243,.85);
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      padding: 3px 8px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .blockActions{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+    }
+
+    .tinyBtn{
+      width: 34px;
+      height: 30px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 13px;
+    }
+    .tinyBtn[disabled]{ opacity: .35; cursor: default; }
+    .tinyBtn:active{ transform: translateY(1px); }
+
+    .blockBottom{
+      margin-top: 8px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+    }
+    .switch{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      color: rgba(232,236,243,.92);
+      font-size: 12px;
+    }
+    .switch input{ width: 18px; height: 18px; }
+
+    .renameRow{
+      display:none;
+      margin-top: 10px;
+      gap: 10px;
+      align-items:center;
+    }
+    .renameRow.show{ display:flex; }
+    .renameRow input{
+      flex: 1 1 auto;
+      padding: 10px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
+      color: var(--text);
+      outline:none;
+      font-size: 13px;
+    }
+
+    .customFooter{
+      margin-top: 14px;
+      display:flex;
+      gap: 10px;
+      justify-content: space-between;
+      align-items:center;
+    }
+    .ghostBtn{
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.02);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 13px;
+      cursor:pointer;
+      min-width: 120px;
+    }
+    .ghostBtn:active{ transform: translateY(1px); }
+
     /* ===== view mode helpers ===== */
     .hidden { display: none !important; }
 
-    /* ===== responsive: mobile =====
-       - goal preview hidden
-       - cells square-ish
-       - calendar panel ~3/4 height (so diary can peek after open)
-    */
+    /* ===== responsive ===== */
     @media (max-width: 640px){
       .wrap{ padding-bottom: 22px; }
       .dow{ padding: 8px 8px 0; gap: 6px; }
@@ -714,23 +933,17 @@
 
       .cell{
         height: auto;
-        aspect-ratio: 1 / 1.07; /* slightly taller than perfect square */
+        aspect-ratio: 1 / 1.07;
         padding: 7px;
       }
-
       .dot{ width: 18px; height: 18px; right: 7px; bottom: 7px; }
 
-      /* calendar panel size target: ~3/4 viewport */
-      .grid.calendarPanel{
-        max-height: 72vh;
-      }
+      .grid.calendarPanel{ max-height: 72vh; }
+      .moodPick{ width: 32px; height: 32px; }
     }
 
-    /* ===== responsive: show goal preview only on wide screens =====
-       (practically "PC / wide tablet")
-    */
     @media (min-width: 760px){
-      .goalPreview{ display:none; } /* base */
+      .goalPreview{ display:none; }
       .goalPreview.show{ display:-webkit-box; }
       .cell{ height: 96px; }
     }
@@ -770,57 +983,79 @@
     <div class="days" id="days"></div>
   </section>
 
-  <!-- 単日日記 -->
-  <section class="diary" id="diary">
-    <div class="diaryHead">
-      <div class="diaryHeadLeft">
-        <div class="diaryStamp" id="diaryStamp" aria-label="その日のスタンプ（クリックで変更）"></div>
-        <div>
-          <div class="diaryLabel">日記</div>
-          <div class="diaryDate" id="diaryDate">----</div>
+  <!-- 日記 + カスタマイズ（スライド） -->
+  <div class="diaryWrap" id="diaryWrap" style="display:none;">
+    <div class="slider" id="slider">
+      <!-- Diary Panel -->
+      <section class="panel" id="diaryPanel">
+        <div class="diaryHead">
+          <div class="diaryHeadLeft">
+            <div class="diaryStamp" id="diaryStamp" aria-label="その日のスタンプ（クリックで変更）"></div>
+            <div>
+              <div class="diaryLabel">日記</div>
+              <div class="diaryDate" id="diaryDate">----</div>
+            </div>
+          </div>
+
+          <div class="headBtns">
+            <!-- 設定（歯車） -->
+            <button class="iconBtn" id="openCustomize" type="button" aria-label="ブロック設定">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" stroke="currentColor" stroke-width="1.8"/>
+                <path d="M19.4 13.5a7.9 7.9 0 0 0 0-3l1.4-1.1-1.9-3.3-1.7.7a8.3 8.3 0 0 0-2.6-1.5L14.3 3h-4.6l-.3 2.3a8.3 8.3 0 0 0-2.6 1.5l-1.7-.7-1.9 3.3 1.4 1.1a7.9 7.9 0 0 0 0 3L3.2 14.6l1.9 3.3 1.7-.7a8.3 8.3 0 0 0 2.6 1.5l.3 2.3h4.6l.3-2.3a8.3 8.3 0 0 0 2.6-1.5l1.7.7 1.9-3.3-1.4-1.1Z"
+                      stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+              </svg>
+            </button>
+
+            <!-- 削除（ゴミ箱） -->
+            <button class="iconBtn" id="deleteDay" type="button" aria-label="この日を削除">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M9 3h6m-8 4h10m-9 0 1 16h6l1-16M10 7v12m4-12v12"
+                      stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
         </div>
-      </div>
 
-      <button class="iconBtn" id="deleteDay" type="button" aria-label="この日を削除">
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M9 3h6m-8 4h10m-9 0 1 16h6l1-16M10 7v12m4-12v12"
-                stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
+        <div class="inlineConfirm" id="inlineConfirm">
+          <div class="inlineConfirmMsg" id="inlineConfirmMsg">この日のデータを削除しますか？</div>
+          <div class="inlineConfirmBtns">
+            <button class="btn" id="inlineNo" type="button">いいえ</button>
+            <button class="btn danger" id="inlineYes" type="button">はい</button>
+          </div>
+        </div>
+
+        <!-- ブロック描画先 -->
+        <div id="diaryBlocks"></div>
+
+        <div class="hint">日付切替で内容が切り替わる。</div>
+      </section>
+
+      <!-- Customize Panel -->
+      <section class="panel" id="customPanel">
+        <div class="customHead">
+          <div style="min-width:0;">
+            <div class="customTitle">ブロック設定</div>
+            <div class="customSub">表示／並び順／名前だけ先に対応。<br>（追加・削除・…メニューは骨格が安定してから入れる）</div>
+          </div>
+          <button class="iconBtn" id="closeCustomize" type="button" aria-label="戻る">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="blockList" id="blockList"></div>
+
+        <div class="customFooter">
+          <button class="ghostBtn" id="cancelCustomize" type="button">キャンセル</button>
+          <button class="btn" id="saveCustomize" type="button">変更を保存</button>
+        </div>
+
+        <div class="hint">※「今日の気分は？」は先頭固定。<br>※「今日の目標」は2番目固定。</div>
+      </section>
     </div>
-
-    <div class="inlineConfirm" id="inlineConfirm">
-      <div class="inlineConfirmMsg" id="inlineConfirmMsg">この日のデータを削除しますか？</div>
-      <div class="inlineConfirmBtns">
-        <button class="btn" id="inlineNo" type="button">いいえ</button>
-        <button class="btn danger" id="inlineYes" type="button">はい</button>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="sectionHead">
-        <div class="sectionTitle">① 今日の目標</div>
-      </div>
-      <input class="goal" id="goalInput" type="text" placeholder="1行で入力（自動保存）" />
-    </div>
-
-    <div class="section">
-      <div class="sectionHead">
-        <div class="sectionTitle">② TODO</div>
-        <button class="btn" id="addTodo" type="button" style="padding:8px 10px; border-radius:12px;">＋</button>
-      </div>
-      <div class="todoList" id="todoList"></div>
-    </div>
-
-    <div class="section">
-      <div class="sectionHead">
-        <div class="sectionTitle">③ 自由メモ</div>
-      </div>
-      <textarea class="memo" id="memoInput" placeholder="数行メモ（自動保存）"></textarea>
-    </div>
-
-    <div class="hint">日付切替で内容が切り替わる。</div>
-  </section>
+  </div>
 
   <!-- 日記一覧 -->
   <section class="list" id="list">
@@ -833,7 +1068,6 @@
 
   <!-- データ管理 -->
   <section class="data" id="data">
-
     <div class="majorTitle">▼ユーザーデータ</div>
 
     <div class="kvRow">
@@ -897,11 +1131,14 @@
 
 <!-- 色選択ポップアップ（5色） -->
 <div class="picker" id="picker" role="dialog" aria-label="スタンプを選ぶ">
-  <button class="pick pink" data-stamp="dot_pink" type="button" aria-label="Color Dot Pink"></button>
-  <button class="pick orange" data-stamp="dot_orange" type="button" aria-label="Color Dot Orange"></button>
-  <button class="pick yellow" data-stamp="dot_yellow" type="button" aria-label="Color Dot Yellow"></button>
-  <button class="pick green" data-stamp="dot_green" type="button" aria-label="Color Dot Green"></button>
-  <button class="pick blue" data-stamp="dot_blue" type="button" aria-label="Color Dot Light Blue"></button>
+  <div class="pickerTitle"><span class="miniDot"></span> 今日の気分は？</div>
+  <div class="pickerRow">
+    <button class="pick pink" data-stamp="dot_pink" type="button" aria-label="Color Dot Pink"></button>
+    <button class="pick orange" data-stamp="dot_orange" type="button" aria-label="Color Dot Orange"></button>
+    <button class="pick yellow" data-stamp="dot_yellow" type="button" aria-label="Color Dot Yellow"></button>
+    <button class="pick green" data-stamp="dot_green" type="button" aria-label="Color Dot Green"></button>
+    <button class="pick blue" data-stamp="dot_blue" type="button" aria-label="Color Dot Light Blue"></button>
+  </div>
 </div>
 <div class="caret" id="caret"></div>
 
@@ -924,27 +1161,32 @@
   const YEAR = 2026;
   const MIN_MONTH = 1;
   const MAX_MONTH = 12;
-  const APP_VERSION = "1.3.0";
+  const APP_VERSION = "1.4.0";
 
-  // ===== Stamp Master (Theme-ready) =====
-  // 今後: autumn_leaves / cats / mushrooms... などテーマ追加しても、
-  // entry側は stampId 参照のままなので壊れにくい。
+  // ===== Stamp Master (Theme-ready, 5 colors) =====
   const STAMP_THEMES = {
     default_dots: {
       id: "default_dots",
       name: "Color Dots",
       stamps: [
-        { id: "dot_pink",   label: "Color Dot Pink",      className: "pink" },
-        { id: "dot_orange", label: "Color Dot Orange",    className: "orange" },
-        { id: "dot_yellow", label: "Color Dot Yellow",    className: "yellow" },
-        { id: "dot_green",  label: "Color Dot Green",     className: "green" },
-        { id: "dot_blue",   label: "Color Dot Light Blue",className: "blue" },
+        { id: "dot_pink",   label: "Color Dot Pink",       className: "pink" },
+        { id: "dot_orange", label: "Color Dot Orange",     className: "orange" },
+        { id: "dot_yellow", label: "Color Dot Yellow",     className: "yellow" },
+        { id: "dot_green",  label: "Color Dot Green",      className: "green" },
+        { id: "dot_blue",   label: "Color Dot Light Blue", className: "blue" },
       ]
     }
   };
-
-  // UIで使うテーマ（将来はユーザー設定に）
   const DEFAULT_THEME_ID = "default_dots";
+
+  // ===== Diary Blocks: templates (今は骨格) =====
+  // “instanceId” を持つ設計にして、将来同種ブロック複数に対応できる形にしておく。
+  const BLOCK_TEMPLATES = {
+    mood: { type:"mood",  defaultName:"今日の気分は？", lockOrder: true,  lockName: true },
+    goal: { type:"goal",  defaultName:"今日の目標",     lockOrder: true,  lockName: false },
+    todo: { type:"todo",  defaultName:"TODOリスト",     lockOrder: false, lockName: false },
+    memo: { type:"memo",  defaultName:"自由メモ",       lockOrder: false, lockName: false },
+  };
 
   // elements
   const headerTitleEl = document.getElementById("headerTitle");
@@ -956,14 +1198,21 @@
   const calendarPanel = document.getElementById("calendarPanel");
   const daysEl = document.getElementById("days");
 
-  const diaryEl = document.getElementById("diary");
+  const diaryWrap = document.getElementById("diaryWrap");
+  const slider = document.getElementById("slider");
+  const diaryPanel = document.getElementById("diaryPanel");
+  const customPanel = document.getElementById("customPanel");
+
   const diaryDateEl = document.getElementById("diaryDate");
   const diaryStampEl = document.getElementById("diaryStamp");
   const deleteDayBtn = document.getElementById("deleteDay");
-  const goalInput = document.getElementById("goalInput");
-  const memoInput = document.getElementById("memoInput");
-  const todoListEl = document.getElementById("todoList");
-  const addTodoBtn = document.getElementById("addTodo");
+  const openCustomizeBtn = document.getElementById("openCustomize");
+  const closeCustomizeBtn = document.getElementById("closeCustomize");
+  const cancelCustomizeBtn = document.getElementById("cancelCustomize");
+  const saveCustomizeBtn = document.getElementById("saveCustomize");
+
+  const diaryBlocksEl = document.getElementById("diaryBlocks");
+  const blockListEl = document.getElementById("blockList");
 
   const inlineConfirm = document.getElementById("inlineConfirm");
   const inlineYes = document.getElementById("inlineYes");
@@ -1016,22 +1265,40 @@
   let viewMode = "calendar"; // calendar | list | data
   let breakdownOpen = false;
 
-  // user settings (theme)
+  // settings (theme + diary layout)
   const SETTINGS_KEY = `sticker-cal:settings:${YEAR}`;
+
+  function uid(){
+    return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`;
+  }
+
+  function defaultDiaryLayout(){
+    // ①mood(固定) ②goal(固定) ③todo ④memo
+    return [
+      { instanceId: "blk_mood_fixed", type:"mood", name: BLOCK_TEMPLATES.mood.defaultName, visible:true },
+      { instanceId: "blk_goal_fixed", type:"goal", name: BLOCK_TEMPLATES.goal.defaultName, visible:true },
+      { instanceId: "blk_todo_1",     type:"todo", name: BLOCK_TEMPLATES.todo.defaultName, visible:true },
+      { instanceId: "blk_memo_1",     type:"memo", name: BLOCK_TEMPLATES.memo.defaultName, visible:true },
+    ];
+  }
+
   function loadSettings(){
     try {
       const s = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}");
-      return {
-        stampThemeId: (typeof s.stampThemeId === "string") ? s.stampThemeId : DEFAULT_THEME_ID
-      };
+      const stampThemeId = (typeof s.stampThemeId === "string") ? s.stampThemeId : DEFAULT_THEME_ID;
+      const diaryLayout = Array.isArray(s.diaryLayout) ? s.diaryLayout : defaultDiaryLayout();
+      return { stampThemeId, diaryLayout };
     } catch {
-      return { stampThemeId: DEFAULT_THEME_ID };
+      return { stampThemeId: DEFAULT_THEME_ID, diaryLayout: defaultDiaryLayout() };
     }
   }
   function saveSettings(obj){
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(obj));
   }
   let settings = loadSettings();
+
+  // customize draft (cancelできるように)
+  let customizeDraft = null;
 
   function getStampTheme(){
     return STAMP_THEMES[settings.stampThemeId] || STAMP_THEMES[DEFAULT_THEME_ID];
@@ -1043,9 +1310,6 @@
     return map;
   }
 
-  function uid(){
-    return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`;
-  }
   function daysInMonthOf(month){
     return new Date(YEAR, month, 0).getDate();
   }
@@ -1053,7 +1317,7 @@
     return `${YEAR}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
   }
 
-  // ===== Backward compat: old 'stamp' color -> new 'stampId' =====
+  // backward compat
   const legacyColorToStampId = {
     pink: "dot_pink",
     orange: "dot_orange",
@@ -1065,9 +1329,8 @@
   function ensureDay(dateKey){
     if (!state[dateKey]) state[dateKey] = { stampId: null, diary: { goal:"", todos: [], memo:"" } };
 
-    // migrate old key if exists
     if (state[dateKey].stamp !== undefined && state[dateKey].stampId === undefined){
-      const legacy = state[dateKey].stamp; // "pink" etc or null
+      const legacy = state[dateKey].stamp;
       state[dateKey].stampId = legacy ? (legacyColorToStampId[legacy] || null) : null;
       delete state[dateKey].stamp;
     }
@@ -1098,25 +1361,18 @@
     saveStateForMonth(currentMonth, state);
   }
 
-  // ===== responsive goal preview: show only on wide screens =====
+  // goal preview condition
   function shouldShowGoalPreview(){
-    // “PCで横幅が一定以上” をこれで判定
-    // 5文字以上表示できない狭さは概ねこれ以下なので、ここで丸める
     return window.matchMedia("(min-width: 760px)").matches;
   }
-  window.addEventListener("resize", () => {
-    // 画面幅変化でプレビュー表示条件が変わる
-    renderCalendar();
-  });
+  window.addEventListener("resize", () => renderCalendar());
 
   function goalPreviewText(goal){
     const s = (goal || "").trim();
-    if (!s) return "";
-    // 2行 clamp はCSSでやるので、ここはそのまま返す
-    return s;
+    return s || "";
   }
 
-  // ===== header behavior by view =====
+  // header by view
   function updateHeader(){
     if (viewMode === "data"){
       headerTitleEl.textContent = "データ管理";
@@ -1143,20 +1399,29 @@
     viewMode = mode;
     hidePicker();
     hideInlineConfirm();
+    closeCustomize(false);
 
-    // calendar visibility: data view hides calendar panel entirely (req 4)
     const calendarVisible = (mode !== "data");
     dowRow.classList.toggle("hidden", !calendarVisible);
     calendarPanel.classList.toggle("hidden", !calendarVisible);
 
-    // panels
-    diaryEl.classList.remove("show");
     listEl.classList.remove("show");
     dataEl.classList.remove("show");
 
+    // diaryWrap visibility (calendar or list only when diary opened)
     if (mode === "calendar"){
-      if (selectedDate) diaryEl.classList.add("show");
-    } else if (mode === "list"){
+      if (selectedDate){
+        diaryWrap.style.display = "";
+        diaryPanel.classList.add("show");
+        customPanel.classList.add("show");
+      } else {
+        diaryWrap.style.display = "none";
+      }
+    } else {
+      diaryWrap.style.display = "none";
+    }
+
+    if (mode === "list"){
       listEl.classList.add("show");
       renderList();
     } else if (mode === "data"){
@@ -1175,6 +1440,8 @@
 
     hidePicker();
     hideInlineConfirm();
+    closeCustomize(false);
+
     selectedDate = null;
     viewMode = "calendar";
 
@@ -1259,9 +1526,9 @@
     persist();
 
     renderCalendar();
-
     if (selectedDate === dateKey){
       setDiaryStampFromDate(dateKey);
+      renderDiaryBlocks(); // mood widget + any preview sync
     }
     if (viewMode === "list") renderList();
     if (viewMode === "data") renderYearStats();
@@ -1300,7 +1567,7 @@
     if (cls) el.classList.add("filled", cls);
   }
 
-  // render calendar (req 3: remove empty 6th row by dynamic weeks)
+  // render calendar (dynamic weeks)
   function renderCalendar(){
     daysEl.innerHTML = "";
 
@@ -1308,7 +1575,6 @@
     const dim = daysInMonthOf(currentMonth);
     const firstDow = first.getDay();
 
-    // number of weeks to render (5 or 6 typically)
     const cellsNeeded = firstDow + dim;
     const weeks = Math.ceil(cellsNeeded / 7);
     const totalCells = weeks * 7;
@@ -1333,7 +1599,6 @@
 
         if (key === selectedDate) cell.classList.add("selected");
 
-        // goal preview: desktop/wide only
         if (showGoal){
           const g = (state[key].diary && typeof state[key].diary.goal === "string") ? state[key].diary.goal : "";
           const pv = goalPreviewText(g);
@@ -1372,138 +1637,282 @@
     }
   }
 
-  // diary
+  // diary open
   function openDiary(dateKey){
     selectedDate = dateKey;
     ensureDay(dateKey);
     persist();
 
+    diaryWrap.style.display = "";
+    diaryPanel.classList.add("show");
+    customPanel.classList.add("show");
+
+    slider.classList.remove("customize");
+
     setView("calendar");
-    diaryEl.classList.add("show");
     diaryDateEl.textContent = dateKey;
     setDiaryStampFromDate(dateKey);
 
-    const d = state[dateKey].diary;
-    goalInput.value = d.goal || "";
-    memoInput.value = d.memo || "";
-    renderTodos(dateKey);
-
+    renderDiaryBlocks();
     renderCalendar();
 
-    // req 3: mobileで「開いたのが気付ける」ように軽くスクロール調整
-    // （完全にスクロール0で見える保証は端末差があるので、最小限だけ寄せる）
     if (window.matchMedia("(max-width: 640px)").matches){
-      const rect = diaryEl.getBoundingClientRect();
+      const rect = diaryWrap.getBoundingClientRect();
       if (rect.top > window.innerHeight * 0.75){
         window.scrollTo({ top: window.scrollY + (rect.top - window.innerHeight * 0.55), behavior: "smooth" });
       }
     }
   }
 
-  function renderTodos(dateKey){
-    ensureDay(dateKey);
-    const todos = state[dateKey].diary.todos;
+  // ===== Diary Blocks Rendering (based on settings.diaryLayout) =====
+  function renderDiaryBlocks(){
+    if (!selectedDate) return;
+    ensureDay(selectedDate);
 
-    todoListEl.innerHTML = "";
-    for (const t of todos){
-      const row = document.createElement("div");
-      row.className = "todoRow";
+    diaryBlocksEl.innerHTML = "";
 
-      const chk = document.createElement("input");
-      chk.type = "checkbox";
-      chk.checked = !!t.done;
+    const layout = settings.diaryLayout || [];
+    for (const blk of layout){
+      if (!blk || !blk.visible) continue;
 
-      const txt = document.createElement("input");
-      txt.type = "text";
-      txt.className = "todoText";
-      txt.value = t.text || "";
-      txt.placeholder = "TODO";
-
-      const del = document.createElement("button");
-      del.type = "button";
-      del.className = "todoDel";
-      del.textContent = "－";
-      del.setAttribute("aria-label", "この行を削除");
-
-      txt.addEventListener("focus", () => row.classList.add("showDel"));
-      txt.addEventListener("blur", () => setTimeout(() => row.classList.remove("showDel"), 120));
-
-      chk.addEventListener("change", () => {
-        if (!selectedDate) return;
-        const dd = state[selectedDate].diary;
-        const item = dd.todos.find(x => x.id === t.id);
-        if (!item) return;
-        item.done = chk.checked;
-        persist();
-        if (viewMode === "list") renderList();
-      });
-
-      txt.addEventListener("input", () => {
-        if (!selectedDate) return;
-        const dd = state[selectedDate].diary;
-        const item = dd.todos.find(x => x.id === t.id);
-        if (!item) return;
-        item.text = txt.value || "";
-        persist();
-        if (viewMode === "list") renderList();
-      });
-
-      del.addEventListener("click", () => {
-        if (!selectedDate) return;
-        const dd = state[selectedDate].diary;
-        dd.todos = dd.todos.filter(x => x.id !== t.id);
-        if (dd.todos.length === 0){
-          dd.todos = [{ id: uid(), done:false, text:"" }];
-        }
-        persist();
-        renderTodos(selectedDate);
-        if (viewMode === "list") renderList();
-      });
-
-      row.appendChild(chk);
-      row.appendChild(txt);
-      row.appendChild(del);
-      todoListEl.appendChild(row);
+      if (blk.type === "mood"){
+        diaryBlocksEl.appendChild(renderMoodBlock(blk));
+      } else if (blk.type === "goal"){
+        diaryBlocksEl.appendChild(renderGoalBlock(blk));
+      } else if (blk.type === "todo"){
+        diaryBlocksEl.appendChild(renderTodoBlock(blk));
+      } else if (blk.type === "memo"){
+        diaryBlocksEl.appendChild(renderMemoBlock(blk));
+      }
     }
   }
 
-  goalInput.addEventListener("input", () => {
-    if (!selectedDate) return;
-    ensureDay(selectedDate);
-    state[selectedDate].diary.goal = goalInput.value || "";
-    persist();
-    renderCalendar();
-    if (viewMode === "list") renderList();
-    if (viewMode === "data") renderYearStats();
-  });
+  function renderMoodBlock(blk){
+    const wrap = document.createElement("div");
+    wrap.className = "moodWidget";
 
-  memoInput.addEventListener("input", () => {
-    if (!selectedDate) return;
-    ensureDay(selectedDate);
-    state[selectedDate].diary.memo = memoInput.value || "";
-    persist();
-    if (viewMode === "list") renderList();
-    if (viewMode === "data") renderYearStats();
-  });
+    const title = document.createElement("div");
+    title.className = "moodTitle";
+    title.textContent = "今日の気分は？";
+    wrap.appendChild(title);
 
-  addTodoBtn.addEventListener("click", () => {
-    if (!selectedDate) return;
-    ensureDay(selectedDate);
-    state[selectedDate].diary.todos.push({ id: uid(), done:false, text:"" });
-    persist();
-    renderTodos(selectedDate);
-    if (viewMode === "list") renderList();
-    todoListEl.lastElementChild?.querySelector("input.todoText")?.focus();
-  });
+    const row = document.createElement("div");
+    row.className = "moodRow";
 
-  // diary stamp picker (req 1: stampId sync)
+    const theme = getStampTheme();
+    const current = state[selectedDate].stampId;
+
+    if (current) row.classList.add("hasSelection");
+
+    for (const s of theme.stamps){
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = `moodPick ${s.className}`;
+      b.setAttribute("aria-label", s.label);
+
+      if (current && current === s.id){
+        b.classList.add("isSelected");
+      }
+
+      b.addEventListener("click", () => {
+        const next = (state[selectedDate].stampId === s.id) ? null : s.id;
+        applyStamp(selectedDate, next);
+      });
+
+      row.appendChild(b);
+    }
+
+    wrap.appendChild(row);
+    return wrap;
+  }
+
+  function renderGoalBlock(blk){
+    const section = document.createElement("div");
+    section.className = "section";
+
+    const head = document.createElement("div");
+    head.className = "sectionHead";
+
+    const left = document.createElement("div");
+    left.className = "sectionTitle";
+    left.innerHTML = `② ${escapeHtml(blk.name || "今日の目標")} <span class="chip">固定</span>`;
+    head.appendChild(left);
+
+    section.appendChild(head);
+
+    const input = document.createElement("input");
+    input.className = "goal";
+    input.type = "text";
+    input.placeholder = "1行で入力（自動保存）";
+    input.value = state[selectedDate].diary.goal || "";
+
+    input.addEventListener("input", () => {
+      ensureDay(selectedDate);
+      state[selectedDate].diary.goal = input.value || "";
+      persist();
+      renderCalendar();
+      if (viewMode === "list") renderList();
+      if (viewMode === "data") renderYearStats();
+    });
+
+    section.appendChild(input);
+    return section;
+  }
+
+  function renderTodoBlock(blk){
+    const section = document.createElement("div");
+    section.className = "section";
+
+    const head = document.createElement("div");
+    head.className = "sectionHead";
+
+    const title = document.createElement("div");
+    title.className = "sectionTitle";
+    title.textContent = `③ ${blk.name || "TODOリスト"}`;
+    head.appendChild(title);
+
+    const addBtn = document.createElement("button");
+    addBtn.className = "btn";
+    addBtn.type = "button";
+    addBtn.textContent = "＋";
+    addBtn.style.padding = "8px 10px";
+    addBtn.style.borderRadius = "12px";
+    head.appendChild(addBtn);
+
+    section.appendChild(head);
+
+    const list = document.createElement("div");
+    list.className = "todoList";
+    section.appendChild(list);
+
+    function renderTodos(){
+      ensureDay(selectedDate);
+      const todos = state[selectedDate].diary.todos;
+      list.innerHTML = "";
+
+      for (const t of todos){
+        const row = document.createElement("div");
+        row.className = "todoRow";
+
+        const chk = document.createElement("input");
+        chk.type = "checkbox";
+        chk.checked = !!t.done;
+
+        const txt = document.createElement("input");
+        txt.type = "text";
+        txt.className = "todoText";
+        txt.value = t.text || "";
+        txt.placeholder = "TODO";
+
+        const del = document.createElement("button");
+        del.type = "button";
+        del.className = "todoDel";
+        del.textContent = "－";
+        del.setAttribute("aria-label", "この行を削除");
+
+        txt.addEventListener("focus", () => row.classList.add("showDel"));
+        txt.addEventListener("blur", () => setTimeout(() => row.classList.remove("showDel"), 120));
+
+        chk.addEventListener("change", () => {
+          ensureDay(selectedDate);
+          const dd = state[selectedDate].diary;
+          const item = dd.todos.find(x => x.id === t.id);
+          if (!item) return;
+          item.done = chk.checked;
+          persist();
+          if (viewMode === "list") renderList();
+        });
+
+        txt.addEventListener("input", () => {
+          ensureDay(selectedDate);
+          const dd = state[selectedDate].diary;
+          const item = dd.todos.find(x => x.id === t.id);
+          if (!item) return;
+          item.text = txt.value || "";
+          persist();
+          if (viewMode === "list") renderList();
+        });
+
+        del.addEventListener("click", () => {
+          ensureDay(selectedDate);
+          const dd = state[selectedDate].diary;
+          dd.todos = dd.todos.filter(x => x.id !== t.id);
+          if (dd.todos.length === 0){
+            dd.todos = [{ id: uid(), done:false, text:"" }];
+          }
+          persist();
+          renderTodos();
+          if (viewMode === "list") renderList();
+        });
+
+        row.appendChild(chk);
+        row.appendChild(txt);
+        row.appendChild(del);
+        list.appendChild(row);
+      }
+    }
+
+    addBtn.addEventListener("click", () => {
+      ensureDay(selectedDate);
+      state[selectedDate].diary.todos.push({ id: uid(), done:false, text:"" });
+      persist();
+      renderTodos();
+      if (viewMode === "list") renderList();
+      list.lastElementChild?.querySelector("input.todoText")?.focus();
+    });
+
+    renderTodos();
+    return section;
+  }
+
+  function renderMemoBlock(blk){
+    const section = document.createElement("div");
+    section.className = "section";
+
+    const head = document.createElement("div");
+    head.className = "sectionHead";
+
+    const title = document.createElement("div");
+    title.className = "sectionTitle";
+    title.textContent = `④ ${blk.name || "自由メモ"}`;
+    head.appendChild(title);
+
+    section.appendChild(head);
+
+    const ta = document.createElement("textarea");
+    ta.className = "memo";
+    ta.placeholder = "数行メモ（自動保存）";
+    ta.value = state[selectedDate].diary.memo || "";
+
+    ta.addEventListener("input", () => {
+      ensureDay(selectedDate);
+      state[selectedDate].diary.memo = ta.value || "";
+      persist();
+      if (viewMode === "list") renderList();
+      if (viewMode === "data") renderYearStats();
+    });
+
+    section.appendChild(ta);
+    return section;
+  }
+
+  function escapeHtml(s){
+    return String(s || "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  // diary stamp dot picker (small dot in header)
   diaryStampEl.addEventListener("click", (e) => {
     if (!selectedDate) return;
     e.stopPropagation();
-    if (pickerEl.classList.contains("show") && pickerDate === selectedDate && pickerSource === "diary"){
+    if (pickerEl.classList.contains("show") && pickerDate === selectedDate && pickerSource === "diaryDot"){
       hidePicker();
     } else {
-      showPickerNear(diaryStampEl, selectedDate, "diary");
+      showPickerNear(diaryStampEl, selectedDate, "diaryDot");
     }
   });
 
@@ -1523,11 +1932,227 @@
     delete state[key];
     persist();
     selectedDate = null;
-    diaryEl.classList.remove("show");
+    diaryWrap.style.display = "none";
     hideInlineConfirm();
     renderCalendar();
     if (viewMode === "list") renderList();
     if (viewMode === "data") renderYearStats();
+  });
+
+  // ===== Customize Panel (骨格) =====
+  function openCustomize(){
+    if (!selectedDate) return;
+    customizeDraft = JSON.parse(JSON.stringify(settings.diaryLayout || defaultDiaryLayout()));
+    renderCustomizeList();
+    slider.classList.add("customize");
+  }
+  function closeCustomize(commit){
+    if (!customizeDraft) {
+      slider.classList.remove("customize");
+      return;
+    }
+    if (commit){
+      settings.diaryLayout = sanitizeLayout(customizeDraft);
+      saveSettings(settings);
+      renderDiaryBlocks();
+    }
+    customizeDraft = null;
+    slider.classList.remove("customize");
+  }
+
+  function sanitizeLayout(layout){
+    // mood must be 1st, goal must be 2nd
+    const safe = Array.isArray(layout) ? layout.filter(Boolean) : [];
+    const mood = safe.find(b => b.type === "mood") || { instanceId:"blk_mood_fixed", type:"mood", name:BLOCK_TEMPLATES.mood.defaultName, visible:true };
+    const goal = safe.find(b => b.type === "goal") || { instanceId:"blk_goal_fixed", type:"goal", name:BLOCK_TEMPLATES.goal.defaultName, visible:true };
+
+    // remove duplicates of mood/goal (keep first)
+    const rest = safe.filter(b => b.type !== "mood" && b.type !== "goal");
+
+    // normalize fields
+    function norm(b){
+      const t = BLOCK_TEMPLATES[b.type];
+      return {
+        instanceId: (typeof b.instanceId === "string") ? b.instanceId : uid(),
+        type: b.type,
+        name: (typeof b.name === "string" && b.name.trim()) ? b.name.trim() : (t?.defaultName || b.type),
+        visible: (b.visible !== false)
+      };
+    }
+
+    const out = [norm(mood), norm(goal), ...rest.map(norm)];
+
+    // enforce lockName for mood
+    out[0].name = BLOCK_TEMPLATES.mood.defaultName;
+
+    return out;
+  }
+
+  function renderCustomizeList(){
+    if (!customizeDraft) return;
+    blockListEl.innerHTML = "";
+
+    // ensure lock positions in UI as well
+    customizeDraft = sanitizeLayout(customizeDraft);
+
+    for (let i=0; i<customizeDraft.length; i++){
+      const blk = customizeDraft[i];
+      const tpl = BLOCK_TEMPLATES[blk.type];
+
+      const card = document.createElement("div");
+      card.className = "blockCard";
+
+      const top = document.createElement("div");
+      top.className = "blockTop";
+
+      const name = document.createElement("div");
+      name.className = "blockName";
+
+      const title = document.createElement("strong");
+      title.textContent = blk.name || tpl?.defaultName || blk.type;
+
+      name.appendChild(title);
+
+      if (tpl?.lockOrder){
+        const lock = document.createElement("span");
+        lock.className = "lockTag";
+        lock.textContent = "固定";
+        name.appendChild(lock);
+      }
+
+      top.appendChild(name);
+
+      const actions = document.createElement("div");
+      actions.className = "blockActions";
+
+      // rename (pencil) - mood不可
+      const renameBtn = document.createElement("button");
+      renameBtn.className = "tinyBtn";
+      renameBtn.type = "button";
+      renameBtn.title = "名前を編集";
+      renameBtn.innerHTML = "✎";
+      renameBtn.disabled = !!tpl?.lockName;
+
+      // up/down (mood+goal fixed)
+      const upBtn = document.createElement("button");
+      upBtn.className = "tinyBtn";
+      upBtn.type = "button";
+      upBtn.title = "上へ";
+      upBtn.textContent = "↑";
+      upBtn.disabled = (i <= 2); // 0 mood,1 goal fixed, index2 is first movable
+      if (tpl?.lockOrder) upBtn.disabled = true;
+
+      const downBtn = document.createElement("button");
+      downBtn.className = "tinyBtn";
+      downBtn.type = "button";
+      downBtn.title = "下へ";
+      downBtn.textContent = "↓";
+      downBtn.disabled = (i >= customizeDraft.length - 1);
+      if (tpl?.lockOrder) downBtn.disabled = true;
+
+      actions.appendChild(renameBtn);
+      actions.appendChild(upBtn);
+      actions.appendChild(downBtn);
+
+      top.appendChild(actions);
+      card.appendChild(top);
+
+      const bottom = document.createElement("div");
+      bottom.className = "blockBottom";
+
+      const sw = document.createElement("label");
+      sw.className = "switch";
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.checked = blk.visible !== false;
+      cb.disabled = (blk.type === "mood" || blk.type === "goal"); // 仕様：削除不可・固定表示（まずは）
+      const span = document.createElement("span");
+      span.textContent = cb.disabled ? "表示（固定）" : "表示";
+      sw.appendChild(cb);
+      sw.appendChild(span);
+
+      bottom.appendChild(sw);
+      card.appendChild(bottom);
+
+      const renameRow = document.createElement("div");
+      renameRow.className = "renameRow";
+
+      const renameInput = document.createElement("input");
+      renameInput.type = "text";
+      renameInput.value = blk.name || "";
+      renameInput.placeholder = "ブロック名";
+
+      const renameOk = document.createElement("button");
+      renameOk.className = "btn";
+      renameOk.type = "button";
+      renameOk.textContent = "保存";
+      renameOk.style.minWidth = "90px";
+
+      renameRow.appendChild(renameInput);
+      renameRow.appendChild(renameOk);
+
+      card.appendChild(renameRow);
+
+      // events
+      renameBtn.addEventListener("click", () => {
+        renameRow.classList.toggle("show");
+        if (renameRow.classList.contains("show")) renameInput.focus();
+      });
+
+      renameOk.addEventListener("click", () => {
+        blk.name = (renameInput.value || "").trim() || (tpl?.defaultName || blk.type);
+        // mood name lock
+        if (blk.type === "mood") blk.name = BLOCK_TEMPLATES.mood.defaultName;
+        renderCustomizeList();
+      });
+
+      upBtn.addEventListener("click", () => {
+        if (i <= 2) return;
+        const tmp = customizeDraft[i-1];
+        customizeDraft[i-1] = customizeDraft[i];
+        customizeDraft[i] = tmp;
+        renderCustomizeList();
+      });
+
+      downBtn.addEventListener("click", () => {
+        if (i >= customizeDraft.length - 1) return;
+        const tmp = customizeDraft[i+1];
+        customizeDraft[i+1] = customizeDraft[i];
+        customizeDraft[i] = tmp;
+        renderCustomizeList();
+      });
+
+      cb.addEventListener("change", () => {
+        blk.visible = cb.checked;
+      });
+
+      blockListEl.appendChild(card);
+    }
+  }
+
+  openCustomizeBtn.addEventListener("click", () => {
+    // カスタマイズ中は「カレンダーパネル不要」→隠す
+    calendarPanel.classList.add("hidden");
+    dowRow.classList.add("hidden");
+    openCustomize();
+  });
+
+  function exitCustomizeAndShowCalendar(){
+    calendarPanel.classList.remove("hidden");
+    dowRow.classList.remove("hidden");
+  }
+
+  closeCustomizeBtn.addEventListener("click", () => {
+    closeCustomize(false);
+    exitCustomizeAndShowCalendar();
+  });
+  cancelCustomizeBtn.addEventListener("click", () => {
+    closeCustomize(false);
+    exitCustomizeAndShowCalendar();
+  });
+  saveCustomizeBtn.addEventListener("click", () => {
+    closeCustomize(true);
+    exitCustomizeAndShowCalendar();
   });
 
   // list
@@ -1718,13 +2343,15 @@
     const ok = window.confirm("データ読み込みを実行しますか？\n（データがある月のみ上書きされます）");
     if (!ok) return;
 
-    // settings optional
     if (payload?.settings && typeof payload.settings === "object"){
       const incomingTheme = payload.settings.stampThemeId;
       if (typeof incomingTheme === "string"){
         settings.stampThemeId = incomingTheme;
-        saveSettings(settings);
       }
+      if (Array.isArray(payload.settings.diaryLayout)){
+        settings.diaryLayout = sanitizeLayout(payload.settings.diaryLayout);
+      }
+      saveSettings(settings);
     }
 
     for (let m=MIN_MONTH; m<=MAX_MONTH; m++){
@@ -1739,7 +2366,7 @@
 
     state = loadStateForMonth(currentMonth);
     selectedDate = null;
-    diaryEl.classList.remove("show");
+    diaryWrap.style.display = "none";
     hidePicker();
     hideInlineConfirm();
     renderCalendar();
@@ -1757,7 +2384,7 @@
 
     state = loadStateForMonth(currentMonth);
     selectedDate = null;
-    diaryEl.classList.remove("show");
+    diaryWrap.style.display = "none";
     hidePicker();
     hideInlineConfirm();
     renderCalendar();
@@ -1765,9 +2392,30 @@
     if (viewMode === "data") renderYearStats();
   });
 
+  // hide picker when clicking outside
+  document.addEventListener("pointerdown", (e) => {
+    const inPicker = e.target.closest("#picker");
+    const isDot = e.target.closest(".dot") || e.target.closest("#diaryStamp");
+    if (!inPicker && !isDot) hidePicker();
+  });
+
+  // calendar dot popup
+  function showDotPickerFor(key, el){
+    if (pickerEl.classList.contains("show") && pickerDate === key && pickerSource === "calendar"){
+      hidePicker();
+    } else {
+      showPickerNear(el, key, "calendar");
+    }
+  }
+
+  // calendar click handlers already set in renderCalendar
+
+  // close menu on Esc already
+
   // init
   renderCalendar();
   setView("calendar");
+
 })();
 </script>
 </body>
