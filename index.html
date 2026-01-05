@@ -17,6 +17,7 @@
 
       --ring: rgba(255,255,255,0.14);
       --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --shadow2: 0 16px 40px rgba(0,0,0,.45);
     }
 
     * { box-sizing: border-box; }
@@ -38,7 +39,7 @@
     }
 
     .wrap{
-      max-width: 480px;
+      max-width: 520px;
       margin: 0 auto;
       padding: 14px 14px 40px;
     }
@@ -76,9 +77,7 @@
       font-size: 12px;
       box-shadow: none;
     }
-    button.small:active{
-      transform: translateY(1px);
-    }
+    button.small:active{ transform: translateY(1px); }
 
     .dow{
       display:grid;
@@ -116,17 +115,23 @@
       padding: 8px;
       overflow: hidden;
       touch-action: manipulation;
+      cursor: pointer;
     }
-    .cell.is-empty{
-      opacity: .25;
+    .cell.is-empty{ opacity: .25; cursor: default; }
+
+    .cell.selected{
+      outline: 2px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.05);
     }
 
     .daynum{
       font-size: 12px;
       color: var(--muted);
       line-height: 1;
+      user-select: none;
     }
 
+    /* 日付の丸（スタンプ） */
     .dot{
       position:absolute;
       right: 8px;
@@ -140,10 +145,9 @@
       align-items:center;
       justify-content:center;
       transition: transform .08s ease;
+      cursor: pointer;
     }
-    .dot:active{
-      transform: scale(.95);
-    }
+    .dot:active{ transform: scale(.95); }
 
     .dot.filled{
       border-color: rgba(255,255,255,.18);
@@ -153,29 +157,20 @@
     .dot.yellow { background: var(--yellow); }
     .dot.blue { background: var(--blue); }
 
-    /* picker (3色を一時的に出す) */
-    .picker{
-      position:absolute;
-      inset: 0;
-      display:flex;
-      align-items:flex-end;
-      justify-content:center;
-      padding-bottom: 8px;
+    /* ===== フローティング色ピッカー（枠の上に出す） ===== */
+    .pickerFloat{
+      position: fixed;
+      z-index: 9999;
+      display: none;
       gap: 10px;
-
-      opacity: 0;
-      transform: translateY(10px);
-      pointer-events:none;
-
-      transition: opacity .14s ease, transform .14s ease;
-      background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,.55) 100%);
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(23,26,33,.92);
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(10px);
     }
-    .cell.show-picker .picker{
-      opacity: 1;
-      transform: translateY(0);
-      pointer-events:auto;
-    }
-
+    .pickerFloat.show{ display: flex; }
     .pick{
       width: 22px;
       height: 22px;
@@ -190,201 +185,77 @@
     .pick.yellow { background: var(--yellow); }
     .pick.blue { background: var(--blue); }
 
-    footer{
+    .pickerCaret{
+      position: fixed;
+      z-index: 9998;
+      width: 10px;
+      height: 10px;
+      background: rgba(23,26,33,.92);
+      border-left: 1px solid rgba(255,255,255,.10);
+      border-top: 1px solid rgba(255,255,255,.10);
+      transform: rotate(45deg);
+      display: none;
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(10px);
+    }
+    .pickerCaret.show{ display:block; }
+
+    /* ===== 日記パネル ===== */
+    .diary{
+      margin-top: 12px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 16px;
+      padding: 12px;
+      box-shadow: var(--shadow);
+      display: none;
+    }
+    .diary.show{ display: block; }
+
+    .diaryHead{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom: 10px;
+    }
+    .diaryTitle{
+      font-size: 14px;
       color: var(--muted);
+    }
+    .diaryDate{
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: .02em;
+    }
+
+    .field{
+      margin-top: 10px;
+    }
+    .label{
       font-size: 12px;
-      padding-top: 14px;
-      line-height: 1.6;
+      color: var(--muted);
+      margin-bottom: 6px;
     }
-
-    /* 小さめ端末向け */
-    @media (max-width: 360px){
-      .cell{ height: 58px; }
+    input.goal{
+      width: 100%;
+      padding: 12px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
+      color: var(--text);
+      font-size: 16px; /* 大きめ */
+      outline: none;
     }
-  </style>
-</head>
-<body>
-<header>
-  <div class="wrap">
-    <div class="titleRow">
-      <div>
-        <h1>2026年1月</h1>
-        <div class="sub">日付の丸をタップ → 色を選ぶ</div>
-      </div>
-      <div class="bar">
-        <button class="small" id="clearBtn" type="button">今月をリセット</button>
-      </div>
-    </div>
-  </div>
-</header>
+    input.goal:focus{ border-color: rgba(255,255,255,.22); }
 
-<main class="wrap">
-  <div class="dow">
-    <div>日</div><div>月</div><div>火</div><div>水</div><div>木</div><div>金</div><div>土</div>
-  </div>
-
-  <section class="grid" aria-label="2026年1月カレンダー">
-    <div class="days" id="days"></div>
-  </section>
-
-  <footer>
-    保存はこのiPhone内（ブラウザ）だけ。<br/>
-    次の段階で「ホーム画面に追加」や「別端末同期」もできる。
-  </footer>
-</main>
-
-<script>
-(() => {
-  // ====== 設定 ======
-  const YEAR = 2026;
-  const MONTH = 1; // 1-12
-  const STORAGE_KEY = `sticker-cal:${YEAR}-${String(MONTH).padStart(2,'0')}`;
-
-  // color ids
-  const COLORS = ["pink", "yellow", "blue"]; // 3種
-  // ====== ここまで ======
-
-  const daysEl = document.getElementById("days");
-  const clearBtn = document.getElementById("clearBtn");
-
-  // localStorage から読み込み（例: {"2026-01-03":"pink", ...}）
-  function loadState(){
-    try{
-      return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-    }catch{
-      return {};
+    .todoRow{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      margin-top: 8px;
     }
-  }
-  function saveState(state){
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  }
-
-  let state = loadState();
-
-  // 2026-01 の構築
-  const first = new Date(YEAR, MONTH - 1, 1);
-  const last = new Date(YEAR, MONTH, 0);
-  const firstDow = first.getDay(); // 0=Sun
-  const daysInMonth = last.getDate();
-
-  // 6週固定(42マス)で並べる（見た目が安定する）
-  const totalCells = 42;
-
-  function ymd(day){
-    return `${YEAR}-${String(MONTH).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-  }
-
-  function closeAllPickers(){
-    document.querySelectorAll(".cell.show-picker").forEach(c => c.classList.remove("show-picker"));
-  }
-
-  // 画面外タップでピッカー閉じる
-  document.addEventListener("pointerdown", (e) => {
-    const cell = e.target.closest(".cell");
-    const isPicker = e.target.closest(".picker");
-    if (!cell && !isPicker) closeAllPickers();
-  });
-
-  function render(){
-    daysEl.innerHTML = "";
-
-    for (let i=0; i<totalCells; i++){
-      const day = i - firstDow + 1;
-      const isInMonth = day >= 1 && day <= daysInMonth;
-
-      const cell = document.createElement("div");
-      cell.className = "cell" + (isInMonth ? "" : " is-empty");
-      cell.setAttribute("role", "gridcell");
-
-      const daynum = document.createElement("div");
-      daynum.className = "daynum";
-      daynum.textContent = isInMonth ? String(day) : "";
-      cell.appendChild(daynum);
-
-      // 日付の丸（空 or 色付き）
-      const dot = document.createElement("button");
-      dot.type = "button";
-      dot.className = "dot";
-      dot.setAttribute("aria-label", isInMonth ? `${YEAR}年${MONTH}月${day}日` : "空白");
-      dot.disabled = !isInMonth;
-
-      if (isInMonth){
-        const key = ymd(day);
-        const color = state[key];
-        if (COLORS.includes(color)){
-          dot.classList.add("filled", color);
-        }
-      }
-
-      // タップでピッカー出す（トグル）
-      dot.addEventListener("click", (e) => {
-        e.stopPropagation();
-        if (!isInMonth) return;
-
-        const already = cell.classList.contains("show-picker");
-        closeAllPickers();
-        if (!already) cell.classList.add("show-picker");
-      });
-
-      cell.appendChild(dot);
-
-      // 色選択ピッカー
-      const picker = document.createElement("div");
-      picker.className = "picker";
-      picker.setAttribute("aria-hidden", "true");
-
-      function makePick(color){
-        const b = document.createElement("button");
-        b.type = "button";
-        b.className = `pick ${color}`;
-        b.setAttribute("aria-label", `${color} を貼る`);
-
-        b.addEventListener("click", (e) => {
-          e.stopPropagation();
-          const key = ymd(day);
-          // 同じ色を選んだら「消す」（空に戻す）挙動にしておく
-          if (state[key] === color) {
-            delete state[key];
-          } else {
-            state[key] = color;
-          }
-          saveState(state);
-          cell.classList.remove("show-picker");
-          render();
-        });
-
-        return b;
-      }
-
-      // 3色を並べる
-      picker.appendChild(makePick("pink"));
-      picker.appendChild(makePick("yellow"));
-      picker.appendChild(makePick("blue"));
-
-      // ピッカー内の空タップで閉じないように
-      picker.addEventListener("click", (e) => e.stopPropagation());
-
-      cell.appendChild(picker);
-
-      // セルのどこかをタップしても閉じる（dot以外）
-      cell.addEventListener("click", () => {
-        // すでに開いてるなら閉じる
-        if (cell.classList.contains("show-picker")) cell.classList.remove("show-picker");
-      });
-
-      daysEl.appendChild(cell);
-    }
-  }
-
-  clearBtn.addEventListener("click", () => {
-    state = {};
-    saveState(state);
-    closeAllPickers();
-    render();
-  });
-
-  render();
-})();
-</script>
-</body>
-</html>
+    .todoRow input[type="checkbox"]{
+      width: 18px;
+      height: 18px;
+      accent-color: rgba
