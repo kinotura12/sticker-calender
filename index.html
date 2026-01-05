@@ -1645,7 +1645,7 @@
 
     diaryWrap.style.display = "";
     diaryPanel.classList.add("show");
-    customPanel.classList.add("show");
+　　customPanel.classList.remove("show"); // 普段は出さない
 
     slider.classList.remove("customize");
 
@@ -2131,16 +2131,20 @@
   }
 
   openCustomizeBtn.addEventListener("click", () => {
-    // カスタマイズ中は「カレンダーパネル不要」→隠す
-    calendarPanel.classList.add("hidden");
-    dowRow.classList.add("hidden");
-    openCustomize();
-  });
+  if (!selectedDate) return;
+
+  calendarPanel.classList.add("hidden");
+  dowRow.classList.add("hidden");
+
+  customPanel.classList.add("show");
+  openCustomize();
+});
 
   function exitCustomizeAndShowCalendar(){
-    calendarPanel.classList.remove("hidden");
-    dowRow.classList.remove("hidden");
-  }
+  calendarPanel.classList.remove("hidden");
+  dowRow.classList.remove("hidden");
+  customPanel.classList.remove("show"); // ←追加
+}
 
   closeCustomizeBtn.addEventListener("click", () => {
     closeCustomize(false);
@@ -2420,3 +2424,4 @@
 </script>
 </body>
 </html>
+
