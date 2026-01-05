@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Sticker Calendar 2026-01</title>
+  <title>Sticker Calendar 2026</title>
   <style>
     :root{
       --bg:#0f1115;
@@ -40,22 +40,50 @@
     }
 
     .wrap{
-      max-width: 760px;
+      max-width: 820px;
       margin: 0 auto;
       padding: 14px 14px 40px;
     }
 
     .titleRow{
       display:flex;
-      align-items:flex-end;
+      align-items:center;
       justify-content:space-between;
       gap: 12px;
       padding: 10px 0 8px;
     }
+
+    .monthNav{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .navBtn{
+      width: 36px;
+      height: 34px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 16px;
+      line-height: 1;
+    }
+    .navBtn:active{ transform: translateY(1px); }
+    .navBtn[disabled]{ opacity: .35; cursor: default; transform:none; }
+
     h1{
       margin:0;
       font-size: 18px;
       letter-spacing: .02em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .sub{
       font-size: 12px;
@@ -63,21 +91,11 @@
       margin-top: 2px;
     }
 
-    button.small{
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.06);
-      color: var(--text);
-      border-radius: 10px;
-      padding: 8px 10px;
-      font-size: 12px;
-      cursor: pointer;
-    }
-    button.small:active{ transform: translateY(1px); }
-
     .rightBar{
       display:flex;
       gap:8px;
       align-items:center;
+      flex: 0 0 auto;
     }
 
     /* ハンバーガー */
@@ -232,7 +250,7 @@
       position: fixed;
       right: 14px;
       top: 74px;
-      width: min(320px, calc(100vw - 28px));
+      width: min(340px, calc(100vw - 28px));
       background: rgba(23,26,33,.92);
       border: 1px solid rgba(255,255,255,.12);
       border-radius: 16px;
@@ -259,9 +277,57 @@
       margin-bottom: 8px;
     }
     .menuItem:last-child{ margin-bottom:0; }
-    .badge{
-      font-size: 12px;
-      color: var(--muted);
+    .badge{ font-size: 12px; color: var(--muted); }
+
+    /* ===== Confirm Modal ===== */
+    .confirmOverlay{
+      position: fixed;
+      inset: 0;
+      display:none;
+      z-index: 80;
+      background: rgba(0,0,0,.45);
+      backdrop-filter: blur(6px);
+    }
+    .confirmOverlay.show{ display:block; }
+
+    .confirmBox{
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: min(380px, calc(100vw - 28px));
+      background: rgba(23,26,33,.94);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.55);
+      padding: 12px;
+    }
+    .confirmMsg{
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 12px;
+      color: rgba(232,236,243,.95);
+      white-space: pre-wrap;
+    }
+    .confirmBtns{
+      display:flex;
+      gap: 10px;
+      justify-content:flex-end;
+    }
+    .btn{
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 13px;
+      cursor:pointer;
+      min-width: 90px;
+    }
+    .btn:active{ transform: translateY(1px); }
+    .btn.primary{
+      border-color: rgba(255,255,255,.18);
+      background: rgba(255,255,255,.10);
     }
 
     /* ===== 日記（単日） ===== */
@@ -303,16 +369,23 @@
     .diaryStamp.yellow{ background: var(--yellow); }
     .diaryStamp.blue{ background: var(--blue); }
 
-    .diaryLabel{
-      font-size: 12px;
-      color: var(--muted);
+    .diaryLabel{ font-size: 12px; color: var(--muted); }
+    .diaryDate{ font-size: 16px; font-weight: 700; letter-spacing: .02em; margin-top: 2px; }
+
+    .iconBtn{
+      width: 38px;
+      height: 34px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
     }
-    .diaryDate{
-      font-size: 16px;
-      font-weight: 700;
-      letter-spacing: .02em;
-      margin-top: 2px;
-    }
+    .iconBtn:active{ transform: translateY(1px); }
+    .iconBtn svg{ width: 18px; height: 18px; opacity:.9; }
 
     .section{
       margin-top: 12px;
@@ -331,10 +404,7 @@
       gap: 10px;
       margin-bottom: 8px;
     }
-    .sectionTitle{
-      font-size: 12px;
-      color: var(--muted);
-    }
+    .sectionTitle{ font-size: 12px; color: var(--muted); }
 
     input.goal{
       width: 100%;
@@ -348,7 +418,6 @@
     }
     input.goal:focus{ border-color: rgba(255,255,255,.22); }
 
-    /* TODO */
     .todoList{ display:flex; flex-direction:column; gap: 8px; }
     .todoRow{
       display:flex;
@@ -405,12 +474,7 @@
     }
     textarea.memo:focus{ border-color: rgba(255,255,255,.22); }
 
-    .hint{
-      color: var(--muted);
-      font-size: 12px;
-      margin-top: 10px;
-      line-height: 1.6;
-    }
+    .hint{ color: var(--muted); font-size: 12px; margin-top: 10px; line-height: 1.6; }
 
     /* ===== 日記一覧 ===== */
     .list{
@@ -431,10 +495,7 @@
       gap: 10px;
       margin-bottom: 10px;
     }
-    .listTitle{
-      font-size: 14px;
-      color: var(--muted);
-    }
+    .listTitle{ font-size: 14px; color: var(--muted); }
 
     .listItem{
       border-top: 1px solid rgba(255,255,255,.06);
@@ -485,6 +546,63 @@
     }
     .muted{ color: var(--muted); }
 
+    /* ===== データ管理 ===== */
+    .data{
+      margin-top: 12px;
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 16px;
+      padding: 12px;
+      box-shadow: var(--shadow);
+      display:none;
+    }
+    .data.show{ display:block; }
+
+    .dataHead{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .dataTitle{ font-size: 14px; color: var(--muted); }
+
+    .row{
+      display:flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items:center;
+      justify-content:space-between;
+      padding: 10px 0;
+      border-top: 1px solid rgba(255,255,255,.06);
+    }
+    .row:first-of-type{ border-top:none; padding-top:0; }
+    .rowLabel{
+      min-width: 140px;
+      font-size: 13px;
+      color: rgba(232,236,243,.92);
+    }
+    .controls{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      flex-wrap: wrap;
+      justify-content:flex-end;
+    }
+    select{
+      padding: 10px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
+      color: var(--text);
+      outline: none;
+      font-size: 13px;
+    }
+    input[type="file"]{
+      color: var(--muted);
+      font-size: 12px;
+    }
+
     @media (max-width: 360px){
       .cell{ height: 58px; }
     }
@@ -495,12 +613,18 @@
 <header>
   <div class="wrap">
     <div class="titleRow">
-      <div>
-        <h1>2026年1月</h1>
-        <div class="sub">丸タップで色 / 日付タップで日記</div>
+      <div style="min-width:0;">
+        <div class="monthNav">
+          <button class="navBtn" id="prevMonth" type="button" aria-label="前の月">＜</button>
+          <div style="min-width:0;">
+            <h1 id="monthTitle">2026年1月</h1>
+            <div class="sub">丸タップで色 / 日付タップで日記</div>
+          </div>
+          <button class="navBtn" id="nextMonth" type="button" aria-label="次の月">＞</button>
+        </div>
       </div>
+
       <div class="rightBar">
-        <button class="small" id="resetMonth" type="button">今月リセット</button>
         <button class="hamburger" id="hamburger" type="button" aria-label="メニュー">
           <span></span><span></span><span></span>
         </button>
@@ -514,7 +638,7 @@
     <div>日</div><div>月</div><div>火</div><div>水</div><div>木</div><div>金</div><div>土</div>
   </div>
 
-  <section class="grid" aria-label="2026年1月カレンダー">
+  <section class="grid" aria-label="カレンダー">
     <div class="days" id="days"></div>
   </section>
 
@@ -528,7 +652,14 @@
           <div class="diaryDate" id="diaryDate">----</div>
         </div>
       </div>
-      <button class="small" id="resetDay" type="button">この日を消す</button>
+
+      <!-- ゴミ箱 -->
+      <button class="iconBtn" id="deleteDay" type="button" aria-label="この日を削除">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M9 3h6m-8 4h10m-9 0 1 16h6l1-16M10 7v12m4-12v12"
+                stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
     </div>
 
     <div class="section">
@@ -541,7 +672,7 @@
     <div class="section">
       <div class="sectionHead">
         <div class="sectionTitle">② TODO</div>
-        <button class="small" id="addTodo" type="button">＋</button>
+        <button class="btn" id="addTodo" type="button" style="padding:8px 10px; border-radius:12px;">＋</button>
       </div>
       <div class="todoList" id="todoList"></div>
     </div>
@@ -564,6 +695,46 @@
     </div>
     <div id="listBody"></div>
   </section>
+
+  <!-- データ管理 -->
+  <section class="data" id="data">
+    <div class="dataHead">
+      <div class="dataTitle">データ管理</div>
+      <div class="badge" id="dataBadge"></div>
+    </div>
+
+    <div class="row">
+      <div class="rowLabel">① 今月リセット</div>
+      <div class="controls">
+        <button class="btn primary" id="resetMonthInData" type="button">今月を削除</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="rowLabel">② データ書き出し</div>
+      <div class="controls">
+        <select id="exportMonthSelect" aria-label="書き出し月">
+          <option value="1">1月</option><option value="2">2月</option><option value="3">3月</option>
+          <option value="4">4月</option><option value="5">5月</option><option value="6">6月</option>
+          <option value="7">7月</option><option value="8">8月</option><option value="9">9月</option>
+          <option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
+        </select>
+        <button class="btn" id="exportBtn" type="button">書き出す</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="rowLabel">③ データ読み込み</div>
+      <div class="controls">
+        <input type="file" id="importFile" accept="application/json,.json" />
+        <button class="btn" id="importBtn" type="button">読み込む</button>
+      </div>
+    </div>
+
+    <div class="hint">
+      書き出しは JSON。読み込みは「月ごとに上書き」。
+    </div>
+  </section>
 </main>
 
 <!-- 色選択ポップアップ -->
@@ -583,20 +754,42 @@
   <button class="menuItem" id="menuList" type="button">
     <span>日記一覧</span><span class="badge">1〜月末</span>
   </button>
+  <button class="menuItem" id="menuData" type="button">
+    <span>データ管理</span><span class="badge">書き出し/読込</span>
+  </button>
+</div>
+
+<!-- Confirm -->
+<div class="confirmOverlay" id="confirmOverlay" aria-hidden="true">
+  <div class="confirmBox" role="dialog" aria-label="確認">
+    <div class="confirmMsg" id="confirmMsg"></div>
+    <div class="confirmBtns">
+      <button class="btn" id="confirmNo" type="button">いいえ</button>
+      <button class="btn primary" id="confirmYes" type="button">はい</button>
+    </div>
+  </div>
 </div>
 
 <script>
 (() => {
+  // ===== constants =====
   const YEAR = 2026;
-  const MONTH = 1;
-  const STORAGE_KEY = `sticker-cal:${YEAR}-${String(MONTH).padStart(2,'0')}`;
+  const MIN_MONTH = 1;
+  const MAX_MONTH = 12;
   const COLORS = ["pink","yellow","blue"];
+  const APP_VERSION = "1.0.0";
+
+  // ===== elements =====
+  const monthTitleEl = document.getElementById("monthTitle");
+  const prevMonthBtn = document.getElementById("prevMonth");
+  const nextMonthBtn = document.getElementById("nextMonth");
 
   const daysEl = document.getElementById("days");
 
   const diaryEl = document.getElementById("diary");
   const diaryDateEl = document.getElementById("diaryDate");
   const diaryStampEl = document.getElementById("diaryStamp");
+  const deleteDayBtn = document.getElementById("deleteDay");
   const goalInput = document.getElementById("goalInput");
   const memoInput = document.getElementById("memoInput");
   const todoListEl = document.getElementById("todoList");
@@ -606,8 +799,13 @@
   const listBodyEl = document.getElementById("listBody");
   const listBadgeEl = document.getElementById("listBadge");
 
-  const resetMonthBtn = document.getElementById("resetMonth");
-  const resetDayBtn = document.getElementById("resetDay");
+  const dataEl = document.getElementById("data");
+  const dataBadgeEl = document.getElementById("dataBadge");
+  const resetMonthInDataBtn = document.getElementById("resetMonthInData");
+  const exportMonthSelect = document.getElementById("exportMonthSelect");
+  const exportBtn = document.getElementById("exportBtn");
+  const importFile = document.getElementById("importFile");
+  const importBtn = document.getElementById("importBtn");
 
   const pickerEl = document.getElementById("picker");
   const caretEl = document.getElementById("caret");
@@ -617,25 +815,75 @@
   const menuSheet = document.getElementById("menuSheet");
   const menuCalendarBtn = document.getElementById("menuCalendar");
   const menuListBtn = document.getElementById("menuList");
+  const menuDataBtn = document.getElementById("menuData");
 
-  // ===== state =====
-  // state[date] = { stamp, diary: { goal, todos:[{id,done,text}], memo } }
-  function loadState(){
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); }
+  const confirmOverlay = document.getElementById("confirmOverlay");
+  const confirmMsgEl = document.getElementById("confirmMsg");
+  const confirmYesBtn = document.getElementById("confirmYes");
+  const confirmNoBtn = document.getElementById("confirmNo");
+
+  // ===== confirm helper =====
+  let confirmYesHandler = null;
+  function showConfirm(message, onYes){
+    confirmMsgEl.textContent = message;
+    confirmYesHandler = onYes;
+    confirmOverlay.classList.add("show");
+    confirmOverlay.setAttribute("aria-hidden","false");
+  }
+  function hideConfirm(){
+    confirmOverlay.classList.remove("show");
+    confirmOverlay.setAttribute("aria-hidden","true");
+    confirmYesHandler = null;
+  }
+  confirmNoBtn.addEventListener("click", hideConfirm);
+  confirmYesBtn.addEventListener("click", () => {
+    const fn = confirmYesHandler;
+    hideConfirm();
+    try { fn && fn(); } catch {}
+  });
+  confirmOverlay.addEventListener("click", (e) => {
+    if (e.target === confirmOverlay) hideConfirm();
+  });
+
+  // ===== storage per month =====
+  function storageKey(month){
+    return `sticker-cal:${YEAR}-${String(month).padStart(2,'0')}`;
+  }
+  function loadStateForMonth(month){
+    try { return JSON.parse(localStorage.getItem(storageKey(month)) || "{}"); }
     catch { return {}; }
   }
-  let state = loadState();
-  function saveState(){
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  function saveStateForMonth(month, stateObj){
+    localStorage.setItem(storageKey(month), JSON.stringify(stateObj));
   }
+
+  // ===== state =====
+  let currentMonth = 1;
+  let state = loadStateForMonth(currentMonth);
+
+  // date selection in current month only
+  let selectedDate = null;        // "YYYY-MM-DD"
+  let pickerDate = null;
+  let pickerSource = null;        // "calendar" | "diary"
+  let viewMode = "calendar";      // "calendar" | "list" | "data"
+
   function uid(){
     return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`;
   }
-  function ensureDay(key){
-    if (!state[key]) state[key] = { stamp: null, diary: { goal:"", todos: [], memo:"" } };
-    if (!state[key].diary) state[key].diary = { goal:"", todos: [], memo:"" };
 
-    const d = state[key].diary;
+  function daysInMonthOf(month){
+    return new Date(YEAR, month, 0).getDate();
+  }
+
+  function ymd(month, day){
+    return `${YEAR}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+  }
+
+  function ensureDay(dateKey){
+    if (!state[dateKey]) state[dateKey] = { stamp: null, diary: { goal:"", todos: [], memo:"" } };
+    if (!state[dateKey].diary) state[dateKey].diary = { goal:"", todos: [], memo:"" };
+
+    const d = state[dateKey].diary;
     if (typeof d.goal !== "string") d.goal = "";
     if (!Array.isArray(d.todos)) d.todos = [];
     if (typeof d.memo !== "string") d.memo = "";
@@ -655,35 +903,54 @@
     }
   }
 
-  // ===== calendar dates =====
-  const first = new Date(YEAR, MONTH - 1, 1);
-  const last = new Date(YEAR, MONTH, 0);
-  const firstDow = first.getDay();
-  const daysInMonth = last.getDate();
-  const totalCells = 42;
-
-  function ymd(day){
-    return `${YEAR}-${String(MONTH).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+  function persist(){
+    saveStateForMonth(currentMonth, state);
   }
 
-  // ===== view state =====
-  let selectedDate = null; // diary editing date
-  let pickerDate = null;
-  let pickerSource = null; // "calendar" | "diary"
-  let viewMode = "calendar"; // "calendar" | "list"
-
+  // ===== view switching =====
   function setView(mode){
     viewMode = mode;
+    diaryEl.classList.remove("show");
+    listEl.classList.remove("show");
+    dataEl.classList.remove("show");
+
     if (mode === "calendar"){
-      listEl.classList.remove("show");
-      // diary is shown only when a date is selected
       if (selectedDate) diaryEl.classList.add("show");
-    } else {
-      diaryEl.classList.remove("show");
+    } else if (mode === "list"){
       listEl.classList.add("show");
       renderList();
+    } else if (mode === "data"){
+      dataEl.classList.add("show");
+      updateDataBadge();
+      exportMonthSelect.value = String(currentMonth);
     }
   }
+
+  // ===== month UI =====
+  function updateMonthHeader(){
+    monthTitleEl.textContent = `${YEAR}年${currentMonth}月`;
+    prevMonthBtn.disabled = currentMonth <= MIN_MONTH;
+    nextMonthBtn.disabled = currentMonth >= MAX_MONTH;
+  }
+
+  function changeMonth(nextMonth){
+    if (nextMonth < MIN_MONTH || nextMonth > MAX_MONTH) return;
+
+    hidePicker();
+    selectedDate = null;
+    setView("calendar");
+
+    currentMonth = nextMonth;
+    state = loadStateForMonth(currentMonth);
+
+    updateMonthHeader();
+    renderCalendar();
+    // diary/list/data are hidden unless user opens again
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  prevMonthBtn.addEventListener("click", () => changeMonth(currentMonth - 1));
+  nextMonthBtn.addEventListener("click", () => changeMonth(currentMonth + 1));
 
   // ===== picker =====
   function hidePicker(){
@@ -692,6 +959,7 @@
     pickerDate = null;
     pickerSource = null;
   }
+
   function showPickerNear(el, dateKey, source){
     pickerDate = dateKey;
     pickerSource = source;
@@ -722,26 +990,6 @@
     caretEl.style.top = `${caretTop}px`;
   }
 
-  function applyStamp(dateKey, colorOrNull){
-    ensureDay(dateKey);
-    state[dateKey].stamp = colorOrNull;
-    saveState();
-
-    // カレンダー即更新
-    renderCalendar();
-
-    // 日記を開いてる日なら日記ヘッダ即更新
-    if (selectedDate === dateKey){
-      setDiaryStampFromDate(dateKey);
-    }
-
-    // 一覧を見てるなら一覧も更新
-    if (viewMode === "list"){
-      renderList();
-    }
-  }
-
-  // ===== diary =====
   function setDiaryStampFromDate(dateKey){
     ensureDay(dateKey);
     const stamp = state[dateKey].stamp;
@@ -752,13 +1000,149 @@
     }
   }
 
+  function setMiniStampClass(el, stamp){
+    el.className = "miniStamp";
+    if (COLORS.includes(stamp)){
+      el.classList.add("filled", stamp);
+    }
+  }
+
+  function applyStamp(dateKey, colorOrNull){
+    ensureDay(dateKey);
+    state[dateKey].stamp = colorOrNull;
+    persist();
+
+    renderCalendar();
+
+    if (selectedDate === dateKey){
+      setDiaryStampFromDate(dateKey);
+    }
+    if (viewMode === "list"){
+      renderList();
+    }
+  }
+
+  // ピッカー色選択（重要：dateKeyを退避）
+  pickerEl.addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-color]");
+    if (!b || !pickerDate) return;
+
+    const dateKey = pickerDate;             // ★退避
+    const color = b.getAttribute("data-color");
+
+    ensureDay(dateKey);
+    const next = (state[dateKey].stamp === color) ? null : color;
+
+    hidePicker();
+    applyStamp(dateKey, next);
+  });
+
+  // 外タップで閉じる
+  document.addEventListener("pointerdown", (e) => {
+    const inPicker = e.target.closest("#picker");
+    const isDot = e.target.closest(".dot") || e.target.closest("#diaryStamp");
+    if (!inPicker && !isDot) hidePicker();
+  });
+
+  // ===== menu =====
+  function closeMenu(){
+    menuOverlay.classList.remove("show");
+    menuSheet.classList.remove("show");
+  }
+  function openMenu(){
+    menuOverlay.classList.add("show");
+    menuSheet.classList.add("show");
+  }
+
+  hamburgerBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (menuSheet.classList.contains("show")) closeMenu();
+    else openMenu();
+  });
+  menuOverlay.addEventListener("click", closeMenu);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeMenu();
+  });
+
+  menuCalendarBtn.addEventListener("click", () => {
+    closeMenu();
+    setView("calendar");
+  });
+  menuListBtn.addEventListener("click", () => {
+    closeMenu();
+    setView("list");
+  });
+  menuDataBtn.addEventListener("click", () => {
+    closeMenu();
+    setView("data");
+  });
+
+  // ===== calendar render =====
+  function renderCalendar(){
+    daysEl.innerHTML = "";
+
+    const first = new Date(YEAR, currentMonth - 1, 1);
+    const last = new Date(YEAR, currentMonth, 0);
+    const firstDow = first.getDay();
+    const dim = last.getDate();
+    const totalCells = 42;
+
+    for (let i=0; i<totalCells; i++){
+      const day = i - firstDow + 1;
+      const inMonth = day >= 1 && day <= dim;
+
+      const cell = document.createElement("div");
+      cell.className = "cell" + (inMonth ? "" : " empty");
+
+      const num = document.createElement("div");
+      num.className = "daynum";
+      num.textContent = inMonth ? String(day) : "";
+      cell.appendChild(num);
+
+      if (inMonth){
+        const key = ymd(currentMonth, day);
+        ensureDay(key);
+
+        if (key === selectedDate) cell.classList.add("selected");
+
+        cell.addEventListener("click", () => {
+          hidePicker();
+          openDiary(key);
+        });
+
+        const dot = document.createElement("button");
+        dot.type = "button";
+        dot.className = "dot";
+        dot.setAttribute("aria-label", `${key} スタンプ`);
+
+        const stamp = state[key].stamp;
+        if (COLORS.includes(stamp)){
+          dot.classList.add("filled", stamp);
+        }
+
+        dot.addEventListener("click", (e) => {
+          e.stopPropagation();
+          if (pickerEl.classList.contains("show") && pickerDate === key && pickerSource === "calendar"){
+            hidePicker();
+          } else {
+            showPickerNear(dot, key, "calendar");
+          }
+        });
+
+        cell.appendChild(dot);
+      }
+
+      daysEl.appendChild(cell);
+    }
+  }
+
+  // ===== diary =====
   function openDiary(dateKey){
     selectedDate = dateKey;
     ensureDay(dateKey);
-    saveState();
+    persist();
 
-    setView("calendar"); // 編集は単日日記でやる
-
+    setView("calendar");
     diaryEl.classList.add("show");
     diaryDateEl.textContent = dateKey;
     setDiaryStampFromDate(dateKey);
@@ -806,7 +1190,7 @@
         const item = dd.todos.find(x => x.id === t.id);
         if (!item) return;
         item.done = chk.checked;
-        saveState();
+        persist();
         if (viewMode === "list") renderList();
       });
 
@@ -816,8 +1200,7 @@
         const item = dd.todos.find(x => x.id === t.id);
         if (!item) return;
         item.text = txt.value || "";
-        saveState();
-        // 一覧のプレビューは入力に追随
+        persist();
         if (viewMode === "list") renderList();
       });
 
@@ -828,7 +1211,7 @@
         if (dd.todos.length === 0){
           dd.todos = [{ id: uid(), done:false, text:"" }];
         }
-        saveState();
+        persist();
         renderTodos(selectedDate);
         if (viewMode === "list") renderList();
       });
@@ -844,7 +1227,7 @@
     if (!selectedDate) return;
     ensureDay(selectedDate);
     state[selectedDate].diary.goal = goalInput.value || "";
-    saveState();
+    persist();
     if (viewMode === "list") renderList();
   });
 
@@ -852,7 +1235,7 @@
     if (!selectedDate) return;
     ensureDay(selectedDate);
     state[selectedDate].diary.memo = memoInput.value || "";
-    saveState();
+    persist();
     if (viewMode === "list") renderList();
   });
 
@@ -860,12 +1243,10 @@
     if (!selectedDate) return;
     ensureDay(selectedDate);
     state[selectedDate].diary.todos.push({ id: uid(), done:false, text:"" });
-    saveState();
+    persist();
     renderTodos(selectedDate);
     if (viewMode === "list") renderList();
-
-    const lastRow = todoListEl.lastElementChild;
-    lastRow?.querySelector("input.todoText")?.focus();
+    todoListEl.lastElementChild?.querySelector("input.todoText")?.focus();
   });
 
   // 日記ヘッダの丸 → 色変更
@@ -879,134 +1260,31 @@
     }
   });
 
-  // ===== calendar render =====
-  function renderCalendar(){
-    daysEl.innerHTML = "";
-
-    for (let i=0; i<totalCells; i++){
-      const day = i - firstDow + 1;
-      const inMonth = day >= 1 && day <= daysInMonth;
-
-      const cell = document.createElement("div");
-      cell.className = "cell" + (inMonth ? "" : " empty");
-
-      const num = document.createElement("div");
-      num.className = "daynum";
-      num.textContent = inMonth ? String(day) : "";
-      cell.appendChild(num);
-
-      if (inMonth){
-        const key = ymd(day);
-        ensureDay(key);
-
-        if (key === selectedDate) cell.classList.add("selected");
-
-        // 日付クリック → 日記（単日）
-        cell.addEventListener("click", () => {
-          hidePicker();
-          openDiary(key);
-        });
-
-        // スタンプ丸
-        const dot = document.createElement("button");
-        dot.type = "button";
-        dot.className = "dot";
-        dot.setAttribute("aria-label", `${key} スタンプ`);
-
-        const stamp = state[key].stamp;
-        if (COLORS.includes(stamp)){
-          dot.classList.add("filled", stamp);
-        }
-
-        dot.addEventListener("click", (e) => {
-          e.stopPropagation();
-          if (pickerEl.classList.contains("show") && pickerDate === key && pickerSource === "calendar"){
-            hidePicker();
-          } else {
-            showPickerNear(dot, key, "calendar");
-          }
-        });
-
-        cell.appendChild(dot);
-      }
-
-      daysEl.appendChild(cell);
-    }
-  }
-
-  // ===== picker click =====
-pickerEl.addEventListener("click", (e) => {
-  const b = e.target.closest("button[data-color]");
-  if (!b || !pickerDate) return;
-
-  const dateKey = pickerDate;                 // ★退避（これが肝）
-  const color = b.getAttribute("data-color");
-
-  ensureDay(dateKey);
-  const next = (state[dateKey].stamp === color) ? null : color;
-
-  hidePicker();                               // ここで pickerDate は null に戻る
-  applyStamp(dateKey, next);                  // ★退避した dateKey を使う
-});
-
-
-  // 外側タップで閉じる（ハンバーガー・メニューも邪魔しない）
-  document.addEventListener("pointerdown", (e) => {
-    const inPicker = e.target.closest("#picker");
-    const isDot = e.target.closest(".dot") || e.target.closest("#diaryStamp");
-    if (!inPicker && !isDot) hidePicker();
+  // ゴミ箱（確認つき）
+  deleteDayBtn.addEventListener("click", () => {
+    if (!selectedDate) return;
+    const key = selectedDate;
+    showConfirm("本当に削除しますか？", () => {
+      delete state[key];
+      persist();
+      // 削除後は日記を閉じる
+      selectedDate = null;
+      diaryEl.classList.remove("show");
+      renderCalendar();
+      if (viewMode === "list") renderList();
+    });
   });
 
-  // ===== menu =====
-  function closeMenu(){
-    menuOverlay.classList.remove("show");
-    menuSheet.classList.remove("show");
-  }
-  function openMenu(){
-    menuOverlay.classList.add("show");
-    menuSheet.classList.add("show");
-  }
-
-  hamburgerBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    if (menuSheet.classList.contains("show")) closeMenu();
-    else openMenu();
-  });
-  menuOverlay.addEventListener("click", closeMenu);
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeMenu();
-  });
-
-  menuCalendarBtn.addEventListener("click", () => {
-    closeMenu();
-    setView("calendar");
-    // diaryは選択されている日があるなら表示、ないなら非表示のまま
-    if (selectedDate) diaryEl.classList.add("show");
-  });
-
-  menuListBtn.addEventListener("click", () => {
-    closeMenu();
-    setView("list");
-  });
-
-  // ===== list render =====
-  function setMiniStampClass(el, stamp){
-    el.className = "miniStamp";
-    if (COLORS.includes(stamp)){
-      el.classList.add("filled", stamp);
-    }
-  }
-  function escapePreview(s){
-    return (s || "").slice(0, 160);
-  }
+  // ===== list =====
+  function escapePreview(s){ return (s || "").slice(0, 160); }
 
   function renderList(){
-    // 1日〜月末
+    const dim = daysInMonthOf(currentMonth);
     let filledCount = 0;
     listBodyEl.innerHTML = "";
 
-    for (let day=1; day<=daysInMonth; day++){
-      const key = ymd(day);
+    for (let day=1; day<=dim; day++){
+      const key = ymd(currentMonth, day);
       ensureDay(key);
 
       const item = document.createElement("div");
@@ -1029,14 +1307,12 @@ pickerEl.addEventListener("click", (e) => {
       left.appendChild(date);
 
       const editBtn = document.createElement("button");
-      editBtn.className = "small";
+      editBtn.className = "btn";
       editBtn.type = "button";
       editBtn.textContent = "編集";
       editBtn.addEventListener("click", () => {
-        // 編集は単日日記へ
         openDiary(key);
         setView("calendar");
-        // カレンダー位置まで軽くスクロール
         window.scrollTo({ top: 0, behavior: "smooth" });
       });
 
@@ -1045,9 +1321,12 @@ pickerEl.addEventListener("click", (e) => {
 
       const preview = document.createElement("div");
       const d = state[key].diary;
-      const hasAny = (d.goal && d.goal.trim()) ||
-                     (d.memo && d.memo.trim()) ||
-                     (d.todos && d.todos.some(t => (t.text||"").trim() || t.done));
+
+      const hasAny =
+        (d.goal && d.goal.trim()) ||
+        (d.memo && d.memo.trim()) ||
+        (d.todos && d.todos.some(t => (t.text||"").trim() || t.done));
+
       if (hasAny) filledCount++;
 
       const todoLines = (d.todos || [])
@@ -1066,37 +1345,118 @@ pickerEl.addEventListener("click", (e) => {
 
       item.appendChild(head);
       item.appendChild(preview);
-
       listBodyEl.appendChild(item);
     }
 
-    listBadgeEl.textContent = `${filledCount}/${daysInMonth} 日 記入あり`;
+    listBadgeEl.textContent = `${filledCount}/${dim} 日 記入あり`;
   }
 
-  // ===== reset =====
-  resetMonthBtn.addEventListener("click", () => {
-    state = {};
-    saveState();
-    selectedDate = null;
-    hidePicker();
-    diaryEl.classList.remove("show");
-    listEl.classList.remove("show");
-    viewMode = "calendar";
-    renderCalendar();
+  // ===== data management =====
+  function updateDataBadge(){
+    // 現在月のデータ件数
+    const dim = daysInMonthOf(currentMonth);
+    let used = 0;
+    for (let day=1; day<=dim; day++){
+      const key = ymd(currentMonth, day);
+      const it = state[key];
+      if (!it) continue;
+      const d = it.diary || {};
+      const hasAny =
+        (it.stamp) ||
+        (d.goal && d.goal.trim()) ||
+        (d.memo && d.memo.trim()) ||
+        (Array.isArray(d.todos) && d.todos.some(t => (t.text||"").trim() || t.done));
+      if (hasAny) used++;
+    }
+    dataBadgeEl.textContent = `今月: ${used}/${dim} 日`;
+  }
+
+  // 今月リセット（確認つき）
+  resetMonthInDataBtn.addEventListener("click", () => {
+    showConfirm("本当に削除しますか？\n（今月のデータがすべて消えます）", () => {
+      state = {};
+      persist();
+      selectedDate = null;
+      diaryEl.classList.remove("show");
+      hidePicker();
+      renderCalendar();
+      if (viewMode === "list") renderList();
+      updateDataBadge();
+    });
   });
 
-  resetDayBtn.addEventListener("click", () => {
-    if (!selectedDate) return;
-    delete state[selectedDate];
-    saveState();
-    openDiary(selectedDate); // 初期化して表示
-    renderCalendar();
+  // 書き出し
+  exportBtn.addEventListener("click", () => {
+    const m = Number(exportMonthSelect.value || currentMonth);
+    const exportState = loadStateForMonth(m);
+
+    const payload = {
+      app: "StickerCalendar",
+      version: APP_VERSION,
+      year: YEAR,
+      month: m,
+      storageKey: storageKey(m),
+      exportedAt: new Date().toISOString(),
+      data: exportState
+    };
+
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `sticker-calendar-${YEAR}-${String(m).padStart(2,'0')}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    URL.revokeObjectURL(url);
+  });
+
+  // 読み込み（確認つき）
+  importBtn.addEventListener("click", async () => {
+    const file = importFile.files && importFile.files[0];
+    if (!file) return;
+
+    let text = "";
+    try { text = await file.text(); } catch { return; }
+
+    let payload = null;
+    try { payload = JSON.parse(text); } catch { return; }
+
+    // payload.data が無い場合は、ファイル全体をデータとして扱う（雑に救う）
+    const monthFromFile = Number(payload?.month);
+    const targetMonth =
+      (monthFromFile >= MIN_MONTH && monthFromFile <= MAX_MONTH) ? monthFromFile : currentMonth;
+
+    const incoming = (payload && typeof payload === "object" && payload.data && typeof payload.data === "object")
+      ? payload.data
+      : (payload && typeof payload === "object" ? payload : {});
+
+    showConfirm(
+      "いま保存されているデータは消え、上書きされますがよろしいですか？\n（読み込み対象："
+      + `${YEAR}年${targetMonth}月）`,
+      () => {
+        saveStateForMonth(targetMonth, incoming);
+
+        // いま表示中の月なら即反映
+        if (targetMonth === currentMonth){
+          state = loadStateForMonth(currentMonth);
+          selectedDate = null;
+          diaryEl.classList.remove("show");
+          hidePicker();
+          renderCalendar();
+          if (viewMode === "list") renderList();
+          if (viewMode === "data") updateDataBadge();
+        }
+      }
+    );
   });
 
   // ===== init =====
+  updateMonthHeader();
   renderCalendar();
 })();
 </script>
 </body>
 </html>
-
