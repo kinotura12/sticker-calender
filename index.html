@@ -3,28 +3,29 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Sticker Calendar - 2026-01</title>
+  <title>Sticker Calendar 2026-01</title>
   <style>
     :root{
-      --bg: #0f1115;
-      --panel: #171a21;
-      --text: #e8ecf3;
-      --muted: #a9b2c3;
+      --bg:#0f1115;
+      --panel:#171a21;
+      --text:#e8ecf3;
+      --muted:#a9b2c3;
+      --card: rgba(255,255,255,.04);
+      --card2: rgba(255,255,255,.03);
+      --line: rgba(255,255,255,.08);
+      --shadow: 0 12px 30px rgba(0,0,0,.35);
 
-      --pink: #ff6fae;
-      --yellow: #ffd55a;
-      --blue: #62c7ff;
-
-      --ring: rgba(255,255,255,0.14);
-      --shadow: 0 10px 30px rgba(0,0,0,.35);
-      --shadow2: 0 16px 40px rgba(0,0,0,.45);
+      --pink:#ff6fae;
+      --yellow:#ffd55a;
+      --blue:#62c7ff;
+      --ring: rgba(255,255,255,.16);
     }
 
-    * { box-sizing: border-box; }
+    *{ box-sizing:border-box; }
     body{
       margin:0;
       font-family: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif;
-      background: radial-gradient(1200px 800px at 20% 0%, #1a2040 0%, var(--bg) 60%);
+      background: radial-gradient(1100px 700px at 20% 0%, #1a2040 0%, var(--bg) 60%);
       color: var(--text);
       -webkit-tap-highlight-color: transparent;
     }
@@ -32,14 +33,14 @@
     header{
       position: sticky;
       top: 0;
+      z-index: 10;
       backdrop-filter: blur(10px);
       background: rgba(15,17,21,.65);
       border-bottom: 1px solid rgba(255,255,255,.06);
-      z-index: 10;
     }
 
     .wrap{
-      max-width: 520px;
+      max-width: 560px;
       margin: 0 auto;
       padding: 14px 14px 40px;
     }
@@ -48,34 +49,28 @@
       display:flex;
       align-items:flex-end;
       justify-content:space-between;
-      gap: 10px;
-      padding: 10px 0 6px;
+      gap: 12px;
+      padding: 10px 0 8px;
     }
-
     h1{
-      font-size: 18px;
       margin:0;
+      font-size: 18px;
       letter-spacing: .02em;
     }
     .sub{
       font-size: 12px;
       color: var(--muted);
+      margin-top: 2px;
     }
 
-    .bar{
-      display:flex;
-      gap:8px;
-      align-items:center;
-      justify-content:flex-end;
-    }
     button.small{
-      border: 1px solid rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.12);
       background: rgba(255,255,255,.06);
       color: var(--text);
       border-radius: 10px;
       padding: 8px 10px;
       font-size: 12px;
-      box-shadow: none;
+      cursor: pointer;
     }
     button.small:active{ transform: translateY(1px); }
 
@@ -91,7 +86,7 @@
     }
 
     .grid{
-      background: rgba(255,255,255,.04);
+      background: var(--card);
       border: 1px solid rgba(255,255,255,.06);
       border-radius: 16px;
       padding: 10px;
@@ -107,31 +102,32 @@
     }
 
     .cell{
-      position:relative;
-      background: rgba(255,255,255,.03);
-      border: 1px solid rgba(255,255,255,.06);
-      border-radius: 14px;
+      position: relative;
       height: 64px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.06);
+      background: var(--card2);
       padding: 8px;
-      overflow: hidden;
-      touch-action: manipulation;
       cursor: pointer;
+      overflow: hidden;
+      user-select: none;
     }
-    .cell.is-empty{ opacity: .25; cursor: default; }
-
+    .cell.empty{
+      opacity: .25;
+      cursor: default;
+    }
     .cell.selected{
       outline: 2px solid rgba(255,255,255,.18);
-      background: rgba(255,255,255,.05);
+      background: rgba(255,255,255,.055);
     }
 
     .daynum{
       font-size: 12px;
       color: var(--muted);
       line-height: 1;
-      user-select: none;
     }
 
-    /* 日付の丸（スタンプ） */
+    /* スタンプ（空白丸 / 色丸） */
     .dot{
       position:absolute;
       right: 8px;
@@ -141,24 +137,20 @@
       border-radius: 999px;
       border: 2px solid var(--ring);
       background: transparent;
+      cursor: pointer;
       display:flex;
       align-items:center;
       justify-content:center;
       transition: transform .08s ease;
-      cursor: pointer;
     }
     .dot:active{ transform: scale(.95); }
+    .dot.filled{ border-color: rgba(255,255,255,.18); box-shadow: 0 8px 18px rgba(0,0,0,.25); }
+    .dot.pink{ background: var(--pink); }
+    .dot.yellow{ background: var(--yellow); }
+    .dot.blue{ background: var(--blue); }
 
-    .dot.filled{
-      border-color: rgba(255,255,255,.18);
-      box-shadow: 0 6px 18px rgba(0,0,0,.22);
-    }
-    .dot.pink { background: var(--pink); }
-    .dot.yellow { background: var(--yellow); }
-    .dot.blue { background: var(--blue); }
-
-    /* ===== フローティング色ピッカー（枠の上に出す） ===== */
-    .pickerFloat{
+    /* ===== 色選択ポップアップ（枠外・固定） ===== */
+    .picker{
       position: fixed;
       z-index: 9999;
       display: none;
@@ -166,114 +158,73 @@
       padding: 10px 12px;
       border-radius: 14px;
       background: rgba(23,26,33,.92);
-      border: 1px solid rgba(255,255,255,.10);
-      box-shadow: var(--shadow2);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 16px 40px rgba(0,0,0,.45);
       backdrop-filter: blur(10px);
     }
-    .pickerFloat.show{ display: flex; }
+    .picker.show{ display:flex; }
+
     .pick{
       width: 22px;
       height: 22px;
       border-radius: 999px;
       border: 2px solid rgba(255,255,255,.22);
-      box-shadow: 0 8px 22px rgba(0,0,0,.35);
-      transform: translateY(0);
+      box-shadow: 0 10px 22px rgba(0,0,0,.35);
+      cursor: pointer;
       transition: transform .08s ease;
     }
     .pick:active{ transform: translateY(1px) scale(.98); }
-    .pick.pink { background: var(--pink); }
-    .pick.yellow { background: var(--yellow); }
-    .pick.blue { background: var(--blue); }
+    .pick.pink{ background: var(--pink); }
+    .pick.yellow{ background: var(--yellow); }
+    .pick.blue{ background: var(--blue); }
 
-    .pickerCaret{
+    .caret{
       position: fixed;
       z-index: 9998;
-      width: 10px;
-      height: 10px;
+      width: 10px; height: 10px;
       background: rgba(23,26,33,.92);
-      border-left: 1px solid rgba(255,255,255,.10);
-      border-top: 1px solid rgba(255,255,255,.10);
+      border-left: 1px solid rgba(255,255,255,.12);
+      border-top: 1px solid rgba(255,255,255,.12);
       transform: rotate(45deg);
-      display: none;
-      box-shadow: var(--shadow2);
+      display:none;
+      box-shadow: 0 16px 40px rgba(0,0,0,.45);
       backdrop-filter: blur(10px);
     }
-    .pickerCaret.show{ display:block; }
+    .caret.show{ display:block; }
 
-    /* ===== 日記パネル ===== */
+    /* ===== 日記 ===== */
     .diary{
       margin-top: 12px;
-      background: rgba(255,255,255,.04);
+      background: var(--card);
       border: 1px solid rgba(255,255,255,.06);
       border-radius: 16px;
       padding: 12px;
       box-shadow: var(--shadow);
-      display: none;
+      display:none;
     }
-    .diary.show{ display: block; }
+    .diary.show{ display:block; }
 
     .diaryHead{
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:10px;
+      gap:12px;
       margin-bottom: 10px;
     }
-    .diaryTitle{
-      font-size: 14px;
+    .diaryLabel{
+      font-size: 12px;
       color: var(--muted);
     }
     .diaryDate{
       font-size: 16px;
       font-weight: 700;
       letter-spacing: .02em;
+      margin-top: 2px;
     }
 
-    .field{
-      margin-top: 10px;
-    }
-    .label{
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-    input.goal{
+    textarea{
       width: 100%;
-      padding: 12px 12px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.18);
-      color: var(--text);
-      font-size: 16px; /* 大きめ */
-      outline: none;
-    }
-    input.goal:focus{ border-color: rgba(255,255,255,.22); }
-
-    .todoRow{
-      display:flex;
-      gap: 10px;
-      align-items:center;
-      margin-top: 8px;
-    }
-    .todoRow input[type="checkbox"]{
-      width: 18px;
-      height: 18px;
-      accent-color: rgba(255,255,255,.65);
-    }
-    .todoRow input.todoText{
-      flex:1;
-      padding: 10px 10px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.18);
-      color: var(--text);
-      outline: none;
-      font-size: 14px;
-    }
-
-    textarea.notes{
-      width: 100%;
-      min-height: 200px; /* 10行くらいの気分 */
+      min-height: 160px;
       padding: 12px 12px;
       border-radius: 12px;
       border: 1px solid rgba(255,255,255,.10);
@@ -281,14 +232,15 @@
       color: var(--text);
       outline: none;
       resize: vertical;
-      font-size: 14px;
       line-height: 1.5;
+      font-size: 14px;
     }
+    textarea:focus{ border-color: rgba(255,255,255,.22); }
 
-    footer{
+    .hint{
       color: var(--muted);
       font-size: 12px;
-      padding-top: 14px;
+      margin-top: 8px;
       line-height: 1.6;
     }
 
@@ -297,16 +249,17 @@
     }
   </style>
 </head>
+
 <body>
 <header>
   <div class="wrap">
     <div class="titleRow">
       <div>
         <h1>2026年1月</h1>
-        <div class="sub">丸タップで色選択 / 日付タップで日記</div>
+        <div class="sub">丸タップで色 / 日付タップで日記</div>
       </div>
-      <div class="bar">
-        <button class="small" id="clearBtn" type="button">今月をリセット</button>
+      <div style="display:flex; gap:8px;">
+        <button class="small" id="resetMonth" type="button">今月リセット</button>
       </div>
     </div>
   </div>
@@ -321,267 +274,187 @@
     <div class="days" id="days"></div>
   </section>
 
-  <!-- 日記パネル -->
   <section class="diary" id="diary">
     <div class="diaryHead">
       <div>
-        <div class="diaryTitle">日記</div>
+        <div class="diaryLabel">日記</div>
         <div class="diaryDate" id="diaryDate">----</div>
       </div>
-      <button class="small" id="clearDayBtn" type="button">この日を消す</button>
+      <button class="small" id="resetDay" type="button">この日を消す</button>
     </div>
-
-    <div class="field">
-      <div class="label">① 今日の目標（1行）</div>
-      <input class="goal" id="goalInput" type="text" placeholder="例：ラフを1枚描く" />
-    </div>
-
-    <div class="field">
-      <div class="label">② TODO（3行）</div>
-      <div class="todoRow">
-        <input type="checkbox" id="todo0chk" />
-        <input class="todoText" id="todo0txt" type="text" placeholder="TODO 1" />
-      </div>
-      <div class="todoRow">
-        <input type="checkbox" id="todo1chk" />
-        <input class="todoText" id="todo1txt" type="text" placeholder="TODO 2" />
-      </div>
-      <div class="todoRow">
-        <input type="checkbox" id="todo2chk" />
-        <input class="todoText" id="todo2txt" type="text" placeholder="TODO 3" />
-      </div>
-    </div>
-
-    <div class="field">
-      <div class="label">③ 自由記載（10行くらい）</div>
-      <textarea class="notes" id="notesInput" placeholder="今日のこと、メモ、気づき…"></textarea>
+    <textarea id="diaryText" placeholder="ここに日記を書く（保存は自動）"></textarea>
+    <div class="hint">
+      いまは「日記テキスト」だけ。あとで TODO や項目を足せるよう、保存形式は拡張前提にしてある。
     </div>
   </section>
-
-  <footer>
-    保存はこの端末内（ブラウザ）だけ。次で同期もできる。
-  </footer>
 </main>
 
-<!-- フローティング色ピッカー（1個だけ使い回す） -->
-<div class="pickerFloat" id="pickerFloat" role="dialog" aria-label="色を選ぶ">
+<!-- 色選択ポップアップ（使い回し） -->
+<div class="picker" id="picker" role="dialog" aria-label="色を選ぶ">
   <button class="pick pink" data-color="pink" type="button" aria-label="ピンク"></button>
-  <button class="pick yellow" data-color="yellow" type="button" aria-label="きいろ"></button>
-  <button class="pick blue" data-color="blue" type="button" aria-label="みずいろ"></button>
+  <button class="pick yellow" data-color="yellow" type="button" aria-label="黄色"></button>
+  <button class="pick blue" data-color="blue" type="button" aria-label="水色"></button>
 </div>
-<div class="pickerCaret" id="pickerCaret"></div>
+<div class="caret" id="caret"></div>
 
 <script>
 (() => {
-  // ====== 設定 ======
+  // ===== 固定（2026年1月） =====
   const YEAR = 2026;
   const MONTH = 1; // 1-12
   const STORAGE_KEY = `sticker-cal:${YEAR}-${String(MONTH).padStart(2,'0')}`;
-  const COLORS = ["pink", "yellow", "blue"];
-  // ====== ここまで ======
+  const COLORS = ["pink","yellow","blue"];
 
+  // ===== 要素 =====
   const daysEl = document.getElementById("days");
-  const clearBtn = document.getElementById("clearBtn");
-
   const diaryEl = document.getElementById("diary");
   const diaryDateEl = document.getElementById("diaryDate");
-  const clearDayBtn = document.getElementById("clearDayBtn");
+  const diaryTextEl = document.getElementById("diaryText");
+  const resetMonthBtn = document.getElementById("resetMonth");
+  const resetDayBtn = document.getElementById("resetDay");
 
-  const goalInput = document.getElementById("goalInput");
-  const notesInput = document.getElementById("notesInput");
-  const todoChk = [0,1,2].map(i => document.getElementById(`todo${i}chk`));
-  const todoTxt = [0,1,2].map(i => document.getElementById(`todo${i}txt`));
+  const pickerEl = document.getElementById("picker");
+  const caretEl = document.getElementById("caret");
 
-  const pickerFloat = document.getElementById("pickerFloat");
-  const pickerCaret = document.getElementById("pickerCaret");
-
-  // state: { "YYYY-MM-DD": { color?: "pink"|"yellow"|"blue", goal:"", todos:[{done,bool,text}], notes:"" } }
+  // ===== 保存データ（拡張しやすい形） =====
+  // state = {
+  //   "YYYY-MM-DD": { stamp: "pink"|"yellow"|"blue"|null, diary: { text: "..." } }
+  // }
   function loadState(){
     try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); }
     catch { return {}; }
   }
-  function saveState(state){
+  function saveState(){
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }
   let state = loadState();
 
+  function ensureDay(key){
+    if (!state[key]) state[key] = { stamp: null, diary: { text: "" } };
+    if (!state[key].diary) state[key].diary = { text: "" };
+    if (typeof state[key].diary.text !== "string") state[key].diary.text = "";
+  }
+
+  // ===== 日付計算 =====
   const first = new Date(YEAR, MONTH - 1, 1);
   const last = new Date(YEAR, MONTH, 0);
   const firstDow = first.getDay(); // 0=Sun
   const daysInMonth = last.getDate();
-  const totalCells = 42;
-
-  let selectedDate = null; // "YYYY-MM-DD"
-  let pickerForDate = null; // "YYYY-MM-DD"
+  const totalCells = 42; // 6週固定
 
   function ymd(day){
     return `${YEAR}-${String(MONTH).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
   }
-  function ensureDayObj(key){
-    if (!state[key]) {
-      state[key] = {
-        color: undefined,
-        goal: "",
-        todos: [
-          { done:false, text:"" },
-          { done:false, text:"" },
-          { done:false, text:"" },
-        ],
-        notes: ""
-      };
-    } else {
-      // 古いデータ互換
-      state[key].todos ||= [
-        { done:false, text:"" },
-        { done:false, text:"" },
-        { done:false, text:"" },
-      ];
-      for (let i=0;i<3;i++){
-        state[key].todos[i] ||= { done:false, text:"" };
-      }
-      state[key].goal ||= "";
-      state[key].notes ||= "";
-    }
-  }
+
+  // ===== UI 状態 =====
+  let selectedDate = null;   // 日記表示中の日
+  let pickerDate = null;     // スタンプ選択中の日
 
   function hidePicker(){
-    pickerFloat.classList.remove("show");
-    pickerCaret.classList.remove("show");
-    pickerForDate = null;
+    pickerEl.classList.remove("show");
+    caretEl.classList.remove("show");
+    pickerDate = null;
   }
 
-  // 画面タップでピッカー閉じる（ピッカー内部は除外）
-  document.addEventListener("pointerdown", (e) => {
-    const inPicker = e.target.closest("#pickerFloat");
-    const isDot = e.target.closest(".dot");
-    if (!inPicker && !isDot) hidePicker();
-  });
-
-  // ピッカーの位置決め（dotの上に出す）
   function showPickerNear(dotEl, dateKey){
-    pickerForDate = dateKey;
+    pickerDate = dateKey;
+
+    pickerEl.classList.add("show");
+    caretEl.classList.add("show");
 
     const r = dotEl.getBoundingClientRect();
-    // ピッカーサイズ見積もり（表示してから計測）
-    pickerFloat.classList.add("show");
-    pickerCaret.classList.add("show");
-
-    const pr = pickerFloat.getBoundingClientRect();
+    const pr = pickerEl.getBoundingClientRect();
     const caretSize = 10;
 
-    // dotの上に配置（画面外なら左右調整）
-    let left = r.left + (r.width/2) - (pr.width/2);
+    // dotの上に置く（足りなければ下）
+    let left = r.left + r.width/2 - pr.width/2;
     left = Math.max(8, Math.min(left, window.innerWidth - pr.width - 8));
 
-    let top = r.top - pr.height - 12; // 上に
-    let caretTop = r.top - (caretSize/2) - 6;
+    let top = r.top - pr.height - 12;
+    let caretTop = r.top - caretSize/2 - 6;
 
-    // 上が足りないなら下に出す
     if (top < 8){
       top = r.bottom + 12;
       caretTop = r.bottom + 6;
-      // caretは下向きっぽく見せたいので回転はそのままでもOK（雰囲気優先）
     }
 
-    pickerFloat.style.left = `${left}px`;
-    pickerFloat.style.top = `${top}px`;
+    pickerEl.style.left = `${left}px`;
+    pickerEl.style.top = `${top}px`;
 
-    const caretLeft = r.left + (r.width/2) - (caretSize/2);
-    pickerCaret.style.left = `${caretLeft}px`;
-    pickerCaret.style.top = `${caretTop}px`;
+    const caretLeft = r.left + r.width/2 - caretSize/2;
+    caretEl.style.left = `${caretLeft}px`;
+    caretEl.style.top = `${caretTop}px`;
   }
 
-  function setSelectedDate(key){
-    selectedDate = key;
-    ensureDayObj(key);
-    saveState(state); // 生成したら保存
+  // ===== 日記表示 =====
+  function openDiary(dateKey){
+    selectedDate = dateKey;
+    ensureDay(dateKey);
 
-    // UI反映
     diaryEl.classList.add("show");
-    diaryDateEl.textContent = key;
+    diaryDateEl.textContent = dateKey;
+    diaryTextEl.value = state[dateKey].diary.text || "";
 
-    const d = state[key];
-    goalInput.value = d.goal || "";
-    notesInput.value = d.notes || "";
-    for (let i=0;i<3;i++){
-      todoChk[i].checked = !!d.todos[i].done;
-      todoTxt[i].value = d.todos[i].text || "";
-    }
-
-    render(); // selected枠更新
+    render(); // 選択枠更新
   }
 
-  // 日記入力は全部「入力のたびに保存」でいい（試作はこれが強い）
-  function bindDiaryAutosave(){
-    function saveFromUI(){
-      if (!selectedDate) return;
-      ensureDayObj(selectedDate);
-      const d = state[selectedDate];
+  // 自動保存（拡張時もここに追加していけばOK）
+  diaryTextEl.addEventListener("input", () => {
+    if (!selectedDate) return;
+    ensureDay(selectedDate);
+    state[selectedDate].diary.text = diaryTextEl.value || "";
+    saveState();
+  });
 
-      d.goal = goalInput.value || "";
-      d.notes = notesInput.value || "";
-      for (let i=0;i<3;i++){
-        d.todos[i].done = !!todoChk[i].checked;
-        d.todos[i].text = todoTxt[i].value || "";
-      }
-      saveState(state);
-    }
-
-    goalInput.addEventListener("input", saveFromUI);
-    notesInput.addEventListener("input", saveFromUI);
-    for (let i=0;i<3;i++){
-      todoChk[i].addEventListener("change", saveFromUI);
-      todoTxt[i].addEventListener("input", saveFromUI);
-    }
-  }
-
+  // ===== レンダリング =====
   function render(){
     daysEl.innerHTML = "";
 
     for (let i=0; i<totalCells; i++){
       const day = i - firstDow + 1;
-      const isInMonth = day >= 1 && day <= daysInMonth;
+      const inMonth = day >= 1 && day <= daysInMonth;
 
       const cell = document.createElement("div");
-      cell.className = "cell" + (isInMonth ? "" : " is-empty");
-      cell.setAttribute("role", "gridcell");
+      cell.className = "cell" + (inMonth ? "" : " empty");
 
-      const daynum = document.createElement("div");
-      daynum.className = "daynum";
-      daynum.textContent = isInMonth ? String(day) : "";
-      cell.appendChild(daynum);
+      const num = document.createElement("div");
+      num.className = "daynum";
+      num.textContent = inMonth ? String(day) : "";
+      cell.appendChild(num);
 
-      if (isInMonth){
+      if (inMonth){
         const key = ymd(day);
+        ensureDay(key);
+
         if (key === selectedDate) cell.classList.add("selected");
 
-        // 日付セルタップ → 日記を開く（dotは別）
+        // 日付セルクリックで日記
         cell.addEventListener("click", () => {
           hidePicker();
-          setSelectedDate(key);
+          openDiary(key);
         });
 
         // スタンプ丸
         const dot = document.createElement("button");
         dot.type = "button";
         dot.className = "dot";
-        dot.setAttribute("aria-label", `${YEAR}年${MONTH}月${day}日 スタンプ`);
+        dot.setAttribute("aria-label", `${key} スタンプ`);
 
-        ensureDayObj(key);
-        const color = state[key].color;
-        if (COLORS.includes(color)){
-          dot.classList.add("filled", color);
+        const stamp = state[key].stamp;
+        if (COLORS.includes(stamp)){
+          dot.classList.add("filled", stamp);
         }
 
-        // dotタップは「セル選択」させず、ピッカーを出す
+        // dotクリックはセルクリックに伝播させない（仕様の肝）
         dot.addEventListener("click", (e) => {
           e.stopPropagation();
-          // 同じ日ならトグル（開いてたら閉じる）
-          if (pickerFloat.classList.contains("show") && pickerForDate === key){
+
+          // 同じ日で開いてたら閉じる
+          if (pickerEl.classList.contains("show") && pickerDate === key){
             hidePicker();
-            return;
+          } else {
+            showPickerNear(dot, key);
           }
-          showPickerNear(dot, key);
         });
 
         cell.appendChild(dot);
@@ -591,51 +464,50 @@
     }
   }
 
-  // ピッカーの色選択
-  pickerFloat.addEventListener("click", (e) => {
+  // ===== ピッカーで色選択 =====
+  pickerEl.addEventListener("click", (e) => {
     const b = e.target.closest("button[data-color]");
-    if (!b || !pickerForDate) return;
+    if (!b || !pickerDate) return;
 
     const color = b.getAttribute("data-color");
-    ensureDayObj(pickerForDate);
+    ensureDay(pickerDate);
 
-    // 同じ色なら消す（空白へ戻す）
-    if (state[pickerForDate].color === color) {
-      state[pickerForDate].color = undefined;
-    } else {
-      state[pickerForDate].color = color;
-    }
+    // 同色を選んだら消す（空白に戻す）
+    state[pickerDate].stamp = (state[pickerDate].stamp === color) ? null : color;
 
-    saveState(state);
+    saveState();
     hidePicker();
     render();
   });
 
-  clearBtn.addEventListener("click", () => {
+  // ===== 外側タップでピッカー閉じる =====
+  document.addEventListener("pointerdown", (e) => {
+    const inPicker = e.target.closest("#picker");
+    const isDot = e.target.closest(".dot");
+    if (!inPicker && !isDot) hidePicker();
+  });
+
+  // ===== リセット =====
+  resetMonthBtn.addEventListener("click", () => {
     state = {};
-    saveState(state);
+    saveState();
     selectedDate = null;
     hidePicker();
     diaryEl.classList.remove("show");
     render();
   });
 
-  clearDayBtn.addEventListener("click", () => {
+  resetDayBtn.addEventListener("click", () => {
     if (!selectedDate) return;
     delete state[selectedDate];
-    saveState(state);
-    // 画面はクリア状態を表示
-    ensureDayObj(selectedDate); // 空で作り直して表示（「日記枠はある」思想）
-    saveState(state);
-    setSelectedDate(selectedDate);
+    saveState();
+    // 日記欄は開いたまま、空にする
+    openDiary(selectedDate);
     render();
   });
 
-  // 初期描画
+  // ===== 初期描画 =====
   render();
-  bindDiaryAutosave();
-
-  // ついで：最初に1日を選ばず、触った日に出る仕様（希望どおり）
 })();
 </script>
 </body>
