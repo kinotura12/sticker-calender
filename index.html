@@ -935,17 +935,20 @@
   }
 
   // ===== picker click =====
-  pickerEl.addEventListener("click", (e) => {
-    const b = e.target.closest("button[data-color]");
-    if (!b || !pickerDate) return;
+pickerEl.addEventListener("click", (e) => {
+  const b = e.target.closest("button[data-color]");
+  if (!b || !pickerDate) return;
 
-    const color = b.getAttribute("data-color");
-    ensureDay(pickerDate);
+  const dateKey = pickerDate;                 // ★退避（これが肝）
+  const color = b.getAttribute("data-color");
 
-    const next = (state[pickerDate].stamp === color) ? null : color;
-    hidePicker();
-    applyStamp(pickerDate, next);
-  });
+  ensureDay(dateKey);
+  const next = (state[dateKey].stamp === color) ? null : color;
+
+  hidePicker();                               // ここで pickerDate は null に戻る
+  applyStamp(dateKey, next);                  // ★退避した dateKey を使う
+});
+
 
   // 外側タップで閉じる（ハンバーガー・メニューも邪魔しない）
   document.addEventListener("pointerdown", (e) => {
@@ -1096,3 +1099,4 @@
 </script>
 </body>
 </html>
+
