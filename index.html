@@ -33,14 +33,14 @@
     header{
       position: sticky;
       top: 0;
-      z-index: 10;
+      z-index: 20;
       backdrop-filter: blur(10px);
       background: rgba(15,17,21,.65);
       border-bottom: 1px solid rgba(255,255,255,.06);
     }
 
     .wrap{
-      max-width: 600px;
+      max-width: 760px;
       margin: 0 auto;
       padding: 14px 14px 40px;
     }
@@ -73,6 +73,34 @@
       cursor: pointer;
     }
     button.small:active{ transform: translateY(1px); }
+
+    .rightBar{
+      display:flex;
+      gap:8px;
+      align-items:center;
+    }
+
+    /* ハンバーガー */
+    .hamburger{
+      width: 38px;
+      height: 34px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap: 4px;
+      cursor:pointer;
+    }
+    .hamburger span{
+      width: 16px;
+      height: 2px;
+      background: rgba(255,255,255,.75);
+      border-radius: 2px;
+    }
+    .hamburger:active{ transform: translateY(1px); }
 
     .dow{
       display:grid;
@@ -189,7 +217,54 @@
     }
     .caret.show{ display:block; }
 
-    /* ===== 日記 ===== */
+    /* ===== モーダルメニュー（ハンバーガー） ===== */
+    .menuOverlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.35);
+      backdrop-filter: blur(4px);
+      display:none;
+      z-index: 50;
+    }
+    .menuOverlay.show{ display:block; }
+
+    .menuSheet{
+      position: fixed;
+      right: 14px;
+      top: 74px;
+      width: min(320px, calc(100vw - 28px));
+      background: rgba(23,26,33,.92);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 16px;
+      box-shadow: 0 16px 40px rgba(0,0,0,.45);
+      padding: 10px;
+      display:none;
+      z-index: 60;
+    }
+    .menuSheet.show{ display:block; }
+
+    .menuItem{
+      width: 100%;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      padding: 10px 10px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.06);
+      color: var(--text);
+      cursor:pointer;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+    .menuItem:last-child{ margin-bottom:0; }
+    .badge{
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* ===== 日記（単日） ===== */
     .diary{
       margin-top: 12px;
       background: var(--card);
@@ -219,7 +294,10 @@
       border: 2px solid var(--ring);
       background: transparent;
       flex: 0 0 auto;
+      cursor: pointer;
+      transition: transform .08s ease;
     }
+    .diaryStamp:active{ transform: scale(.95); }
     .diaryStamp.filled{ border-color: rgba(255,255,255,.18); box-shadow: 0 8px 18px rgba(0,0,0,.25); }
     .diaryStamp.pink{ background: var(--pink); }
     .diaryStamp.yellow{ background: var(--yellow); }
@@ -266,7 +344,7 @@
       background: rgba(0,0,0,.18);
       color: var(--text);
       outline: none;
-      font-size: 16px; /* 大きめ */
+      font-size: 16px;
     }
     input.goal:focus{ border-color: rgba(255,255,255,.22); }
 
@@ -277,7 +355,7 @@
       align-items:center;
       gap: 10px;
       position: relative;
-      padding-right: 34px; /* -ボタン分の余白 */
+      padding-right: 34px;
     }
     .todoRow input[type="checkbox"]{
       width: 18px; height: 18px;
@@ -296,7 +374,6 @@
     }
     .todoRow input.todoText:focus{ border-color: rgba(255,255,255,.22); }
 
-    /* 入力中に出る - ボタン */
     .todoDel{
       position:absolute;
       right: 0;
@@ -312,7 +389,6 @@
       cursor:pointer;
     }
     .todoRow.showDel .todoDel{ display:block; }
-    .todoDel:active{ transform: translateY(-50%) translateY(1px); }
 
     textarea.memo{
       width: 100%;
@@ -336,6 +412,79 @@
       line-height: 1.6;
     }
 
+    /* ===== 日記一覧 ===== */
+    .list{
+      margin-top: 12px;
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 16px;
+      padding: 12px;
+      box-shadow: var(--shadow);
+      display:none;
+    }
+    .list.show{ display:block; }
+
+    .listHead{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .listTitle{
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .listItem{
+      border-top: 1px solid rgba(255,255,255,.06);
+      padding: 10px 0;
+    }
+    .listItem:first-of-type{ border-top: none; padding-top: 0; }
+
+    .listItemHead{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .listLeft{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .miniStamp{
+      width: 14px; height: 14px;
+      border-radius: 999px;
+      border: 2px solid var(--ring);
+      background: transparent;
+      flex: 0 0 auto;
+    }
+    .miniStamp.filled{ border-color: rgba(255,255,255,.18); }
+    .miniStamp.pink{ background: var(--pink); }
+    .miniStamp.yellow{ background: var(--yellow); }
+    .miniStamp.blue{ background: var(--blue); }
+
+    .listDate{
+      font-weight: 700;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .preview{
+      color: rgba(232,236,243,.85);
+      font-size: 13px;
+      line-height: 1.5;
+      opacity: .92;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .muted{ color: var(--muted); }
+
     @media (max-width: 360px){
       .cell{ height: 58px; }
     }
@@ -350,8 +499,11 @@
         <h1>2026年1月</h1>
         <div class="sub">丸タップで色 / 日付タップで日記</div>
       </div>
-      <div style="display:flex; gap:8px;">
+      <div class="rightBar">
         <button class="small" id="resetMonth" type="button">今月リセット</button>
+        <button class="hamburger" id="hamburger" type="button" aria-label="メニュー">
+          <span></span><span></span><span></span>
+        </button>
       </div>
     </div>
   </div>
@@ -366,10 +518,11 @@
     <div class="days" id="days"></div>
   </section>
 
+  <!-- 単日日記 -->
   <section class="diary" id="diary">
     <div class="diaryHead">
       <div class="diaryHeadLeft">
-        <div class="diaryStamp" id="diaryStamp" aria-label="その日のスタンプ"></div>
+        <div class="diaryStamp" id="diaryStamp" aria-label="その日のスタンプ（クリックで変更）"></div>
         <div>
           <div class="diaryLabel">日記</div>
           <div class="diaryDate" id="diaryDate">----</div>
@@ -378,7 +531,6 @@
       <button class="small" id="resetDay" type="button">この日を消す</button>
     </div>
 
-    <!-- ① 目標 -->
     <div class="section">
       <div class="sectionHead">
         <div class="sectionTitle">① 今日の目標</div>
@@ -386,7 +538,6 @@
       <input class="goal" id="goalInput" type="text" placeholder="1行で入力（自動保存）" />
     </div>
 
-    <!-- ② TODO -->
     <div class="section">
       <div class="sectionHead">
         <div class="sectionTitle">② TODO</div>
@@ -395,7 +546,6 @@
       <div class="todoList" id="todoList"></div>
     </div>
 
-    <!-- ③ 自由メモ -->
     <div class="section">
       <div class="sectionHead">
         <div class="sectionTitle">③ 自由メモ</div>
@@ -403,9 +553,16 @@
       <textarea class="memo" id="memoInput" placeholder="数行メモ（自動保存）"></textarea>
     </div>
 
-    <div class="hint">
-      TODOや項目は後から追加できるよう、保存形式は拡張前提。
+    <div class="hint">日付切替で内容が切り替わる。</div>
+  </section>
+
+  <!-- 日記一覧 -->
+  <section class="list" id="list">
+    <div class="listHead">
+      <div class="listTitle">日記一覧（1日〜月末）</div>
+      <div class="badge" id="listBadge"></div>
     </div>
+    <div id="listBody"></div>
   </section>
 </main>
 
@@ -417,15 +574,24 @@
 </div>
 <div class="caret" id="caret"></div>
 
+<!-- メニュー -->
+<div class="menuOverlay" id="menuOverlay"></div>
+<div class="menuSheet" id="menuSheet" role="dialog" aria-label="メニュー">
+  <button class="menuItem" id="menuCalendar" type="button">
+    <span>カレンダー</span><span class="badge">単日日記</span>
+  </button>
+  <button class="menuItem" id="menuList" type="button">
+    <span>日記一覧</span><span class="badge">1〜月末</span>
+  </button>
+</div>
+
 <script>
 (() => {
-  // ===== 固定（2026年1月） =====
   const YEAR = 2026;
   const MONTH = 1;
   const STORAGE_KEY = `sticker-cal:${YEAR}-${String(MONTH).padStart(2,'0')}`;
   const COLORS = ["pink","yellow","blue"];
 
-  // ===== 要素 =====
   const daysEl = document.getElementById("days");
 
   const diaryEl = document.getElementById("diary");
@@ -433,9 +599,12 @@
   const diaryStampEl = document.getElementById("diaryStamp");
   const goalInput = document.getElementById("goalInput");
   const memoInput = document.getElementById("memoInput");
-
   const todoListEl = document.getElementById("todoList");
   const addTodoBtn = document.getElementById("addTodo");
+
+  const listEl = document.getElementById("list");
+  const listBodyEl = document.getElementById("listBody");
+  const listBadgeEl = document.getElementById("listBadge");
 
   const resetMonthBtn = document.getElementById("resetMonth");
   const resetDayBtn = document.getElementById("resetDay");
@@ -443,17 +612,14 @@
   const pickerEl = document.getElementById("picker");
   const caretEl = document.getElementById("caret");
 
-  // ===== 保存データ（拡張しやすい形） =====
-  // state = {
-  //   "YYYY-MM-DD": {
-  //     stamp: "pink"|"yellow"|"blue"|null,
-  //     diary: {
-  //       goal: string,
-  //       todos: Array<{ id: string, done: boolean, text: string }>,
-  //       memo: string
-  //     }
-  //   }
-  // }
+  const hamburgerBtn = document.getElementById("hamburger");
+  const menuOverlay = document.getElementById("menuOverlay");
+  const menuSheet = document.getElementById("menuSheet");
+  const menuCalendarBtn = document.getElementById("menuCalendar");
+  const menuListBtn = document.getElementById("menuList");
+
+  // ===== state =====
+  // state[date] = { stamp, diary: { goal, todos:[{id,done,text}], memo } }
   function loadState(){
     try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); }
     catch { return {}; }
@@ -462,12 +628,9 @@
   function saveState(){
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }
-
   function uid(){
-    // 衝突しにくい簡易ID
     return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`;
   }
-
   function ensureDay(key){
     if (!state[key]) state[key] = { stamp: null, diary: { goal:"", todos: [], memo:"" } };
     if (!state[key].diary) state[key].diary = { goal:"", todos: [], memo:"" };
@@ -477,7 +640,6 @@
     if (!Array.isArray(d.todos)) d.todos = [];
     if (typeof d.memo !== "string") d.memo = "";
 
-    // 初期TODO3行（空で）
     if (d.todos.length === 0){
       d.todos = [
         { id: uid(), done:false, text:"" },
@@ -485,7 +647,6 @@
         { id: uid(), done:false, text:"" },
       ];
     } else {
-      // 既存要素の整形
       d.todos = d.todos.map(t => ({
         id: (t && typeof t.id === "string") ? t.id : uid(),
         done: !!(t && t.done),
@@ -494,7 +655,7 @@
     }
   }
 
-  // ===== 日付計算 =====
+  // ===== calendar dates =====
   const first = new Date(YEAR, MONTH - 1, 1);
   const last = new Date(YEAR, MONTH, 0);
   const firstDow = first.getDay();
@@ -505,23 +666,40 @@
     return `${YEAR}-${String(MONTH).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
   }
 
-  // ===== UI 状態 =====
-  let selectedDate = null;
+  // ===== view state =====
+  let selectedDate = null; // diary editing date
   let pickerDate = null;
+  let pickerSource = null; // "calendar" | "diary"
+  let viewMode = "calendar"; // "calendar" | "list"
 
+  function setView(mode){
+    viewMode = mode;
+    if (mode === "calendar"){
+      listEl.classList.remove("show");
+      // diary is shown only when a date is selected
+      if (selectedDate) diaryEl.classList.add("show");
+    } else {
+      diaryEl.classList.remove("show");
+      listEl.classList.add("show");
+      renderList();
+    }
+  }
+
+  // ===== picker =====
   function hidePicker(){
     pickerEl.classList.remove("show");
     caretEl.classList.remove("show");
     pickerDate = null;
+    pickerSource = null;
   }
-
-  function showPickerNear(dotEl, dateKey){
+  function showPickerNear(el, dateKey, source){
     pickerDate = dateKey;
+    pickerSource = source;
 
     pickerEl.classList.add("show");
     caretEl.classList.add("show");
 
-    const r = dotEl.getBoundingClientRect();
+    const r = el.getBoundingClientRect();
     const pr = pickerEl.getBoundingClientRect();
     const caretSize = 10;
 
@@ -544,6 +722,26 @@
     caretEl.style.top = `${caretTop}px`;
   }
 
+  function applyStamp(dateKey, colorOrNull){
+    ensureDay(dateKey);
+    state[dateKey].stamp = colorOrNull;
+    saveState();
+
+    // カレンダー即更新
+    renderCalendar();
+
+    // 日記を開いてる日なら日記ヘッダ即更新
+    if (selectedDate === dateKey){
+      setDiaryStampFromDate(dateKey);
+    }
+
+    // 一覧を見てるなら一覧も更新
+    if (viewMode === "list"){
+      renderList();
+    }
+  }
+
+  // ===== diary =====
   function setDiaryStampFromDate(dateKey){
     ensureDay(dateKey);
     const stamp = state[dateKey].stamp;
@@ -554,11 +752,12 @@
     }
   }
 
-  // ===== 日記表示＆描画 =====
   function openDiary(dateKey){
     selectedDate = dateKey;
     ensureDay(dateKey);
-    saveState(); // 初期生成を確実に保存
+    saveState();
+
+    setView("calendar"); // 編集は単日日記でやる
 
     diaryEl.classList.add("show");
     diaryDateEl.textContent = dateKey;
@@ -569,7 +768,7 @@
     memoInput.value = d.memo || "";
     renderTodos(dateKey);
 
-    renderCalendar(); // 選択枠更新
+    renderCalendar();
   }
 
   function renderTodos(dateKey){
@@ -598,14 +797,9 @@
       del.textContent = "－";
       del.setAttribute("aria-label", "この行を削除");
 
-      // 入力中に - を出す
       txt.addEventListener("focus", () => row.classList.add("showDel"));
-      txt.addEventListener("blur", () => {
-        // クリックで - を押す瞬間に消えないよう少し遅らせる
-        setTimeout(() => row.classList.remove("showDel"), 120);
-      });
+      txt.addEventListener("blur", () => setTimeout(() => row.classList.remove("showDel"), 120));
 
-      // 保存
       chk.addEventListener("change", () => {
         if (!selectedDate) return;
         const dd = state[selectedDate].diary;
@@ -613,6 +807,7 @@
         if (!item) return;
         item.done = chk.checked;
         saveState();
+        if (viewMode === "list") renderList();
       });
 
       txt.addEventListener("input", () => {
@@ -622,19 +817,20 @@
         if (!item) return;
         item.text = txt.value || "";
         saveState();
+        // 一覧のプレビューは入力に追随
+        if (viewMode === "list") renderList();
       });
 
-      // 削除
       del.addEventListener("click", () => {
         if (!selectedDate) return;
         const dd = state[selectedDate].diary;
         dd.todos = dd.todos.filter(x => x.id !== t.id);
-        // 0行は避けたいなら最低1行残す、などもできる。今は自由に0でもOK。
         if (dd.todos.length === 0){
           dd.todos = [{ id: uid(), done:false, text:"" }];
         }
         saveState();
         renderTodos(selectedDate);
+        if (viewMode === "list") renderList();
       });
 
       row.appendChild(chk);
@@ -644,34 +840,46 @@
     }
   }
 
-  // 目標・メモ：自動保存
   goalInput.addEventListener("input", () => {
     if (!selectedDate) return;
     ensureDay(selectedDate);
     state[selectedDate].diary.goal = goalInput.value || "";
     saveState();
+    if (viewMode === "list") renderList();
   });
+
   memoInput.addEventListener("input", () => {
     if (!selectedDate) return;
     ensureDay(selectedDate);
     state[selectedDate].diary.memo = memoInput.value || "";
     saveState();
+    if (viewMode === "list") renderList();
   });
 
-  // TODO追加
   addTodoBtn.addEventListener("click", () => {
     if (!selectedDate) return;
     ensureDay(selectedDate);
     state[selectedDate].diary.todos.push({ id: uid(), done:false, text:"" });
     saveState();
     renderTodos(selectedDate);
-    // 追加した行にフォーカス
+    if (viewMode === "list") renderList();
+
     const lastRow = todoListEl.lastElementChild;
-    const input = lastRow?.querySelector("input.todoText");
-    input?.focus();
+    lastRow?.querySelector("input.todoText")?.focus();
   });
 
-  // ===== カレンダー描画 =====
+  // 日記ヘッダの丸 → 色変更
+  diaryStampEl.addEventListener("click", (e) => {
+    if (!selectedDate) return;
+    e.stopPropagation();
+    if (pickerEl.classList.contains("show") && pickerDate === selectedDate && pickerSource === "diary"){
+      hidePicker();
+    } else {
+      showPickerNear(diaryStampEl, selectedDate, "diary");
+    }
+  });
+
+  // ===== calendar render =====
   function renderCalendar(){
     daysEl.innerHTML = "";
 
@@ -693,7 +901,7 @@
 
         if (key === selectedDate) cell.classList.add("selected");
 
-        // 日付クリック → 日記
+        // 日付クリック → 日記（単日）
         cell.addEventListener("click", () => {
           hidePicker();
           openDiary(key);
@@ -710,13 +918,12 @@
           dot.classList.add("filled", stamp);
         }
 
-        // dotクリックは日付クリックに伝播させない
         dot.addEventListener("click", (e) => {
           e.stopPropagation();
-          if (pickerEl.classList.contains("show") && pickerDate === key){
+          if (pickerEl.classList.contains("show") && pickerDate === key && pickerSource === "calendar"){
             hidePicker();
           } else {
-            showPickerNear(dot, key);
+            showPickerNear(dot, key, "calendar");
           }
         });
 
@@ -727,7 +934,7 @@
     }
   }
 
-  // ===== ピッカーで色選択 =====
+  // ===== picker click =====
   pickerEl.addEventListener("click", (e) => {
     const b = e.target.closest("button[data-color]");
     if (!b || !pickerDate) return;
@@ -735,35 +942,143 @@
     const color = b.getAttribute("data-color");
     ensureDay(pickerDate);
 
-    // 同色で消す
-    state[pickerDate].stamp = (state[pickerDate].stamp === color) ? null : color;
-
-    saveState();
+    const next = (state[pickerDate].stamp === color) ? null : color;
     hidePicker();
-
-    // カレンダー更新
-    renderCalendar();
-
-    // 日記が開いてる日なら、日記ヘッダの丸も即反映
-    if (selectedDate === pickerDate){
-      setDiaryStampFromDate(selectedDate);
-    }
+    applyStamp(pickerDate, next);
   });
 
-  // 外側タップでピッカー閉じる
+  // 外側タップで閉じる（ハンバーガー・メニューも邪魔しない）
   document.addEventListener("pointerdown", (e) => {
     const inPicker = e.target.closest("#picker");
-    const isDot = e.target.closest(".dot");
+    const isDot = e.target.closest(".dot") || e.target.closest("#diaryStamp");
     if (!inPicker && !isDot) hidePicker();
   });
 
-  // ===== リセット =====
+  // ===== menu =====
+  function closeMenu(){
+    menuOverlay.classList.remove("show");
+    menuSheet.classList.remove("show");
+  }
+  function openMenu(){
+    menuOverlay.classList.add("show");
+    menuSheet.classList.add("show");
+  }
+
+  hamburgerBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (menuSheet.classList.contains("show")) closeMenu();
+    else openMenu();
+  });
+  menuOverlay.addEventListener("click", closeMenu);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeMenu();
+  });
+
+  menuCalendarBtn.addEventListener("click", () => {
+    closeMenu();
+    setView("calendar");
+    // diaryは選択されている日があるなら表示、ないなら非表示のまま
+    if (selectedDate) diaryEl.classList.add("show");
+  });
+
+  menuListBtn.addEventListener("click", () => {
+    closeMenu();
+    setView("list");
+  });
+
+  // ===== list render =====
+  function setMiniStampClass(el, stamp){
+    el.className = "miniStamp";
+    if (COLORS.includes(stamp)){
+      el.classList.add("filled", stamp);
+    }
+  }
+  function escapePreview(s){
+    return (s || "").slice(0, 160);
+  }
+
+  function renderList(){
+    // 1日〜月末
+    let filledCount = 0;
+    listBodyEl.innerHTML = "";
+
+    for (let day=1; day<=daysInMonth; day++){
+      const key = ymd(day);
+      ensureDay(key);
+
+      const item = document.createElement("div");
+      item.className = "listItem";
+
+      const head = document.createElement("div");
+      head.className = "listItemHead";
+
+      const left = document.createElement("div");
+      left.className = "listLeft";
+
+      const stamp = document.createElement("div");
+      setMiniStampClass(stamp, state[key].stamp);
+
+      const date = document.createElement("div");
+      date.className = "listDate";
+      date.textContent = key;
+
+      left.appendChild(stamp);
+      left.appendChild(date);
+
+      const editBtn = document.createElement("button");
+      editBtn.className = "small";
+      editBtn.type = "button";
+      editBtn.textContent = "編集";
+      editBtn.addEventListener("click", () => {
+        // 編集は単日日記へ
+        openDiary(key);
+        setView("calendar");
+        // カレンダー位置まで軽くスクロール
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+
+      head.appendChild(left);
+      head.appendChild(editBtn);
+
+      const preview = document.createElement("div");
+      const d = state[key].diary;
+      const hasAny = (d.goal && d.goal.trim()) ||
+                     (d.memo && d.memo.trim()) ||
+                     (d.todos && d.todos.some(t => (t.text||"").trim() || t.done));
+      if (hasAny) filledCount++;
+
+      const todoLines = (d.todos || [])
+        .filter(t => (t.text||"").trim() || t.done)
+        .slice(0, 3)
+        .map(t => `${t.done ? "☑" : "☐"} ${t.text || ""}`.trim())
+        .join("\n");
+
+      const parts = [];
+      if (d.goal && d.goal.trim()) parts.push(`目標：${escapePreview(d.goal.trim())}`);
+      if (todoLines) parts.push(todoLines);
+      if (d.memo && d.memo.trim()) parts.push(escapePreview(d.memo.trim()));
+
+      preview.className = "preview" + (parts.length ? "" : " muted");
+      preview.textContent = parts.length ? parts.join("\n") : "（未記入）";
+
+      item.appendChild(head);
+      item.appendChild(preview);
+
+      listBodyEl.appendChild(item);
+    }
+
+    listBadgeEl.textContent = `${filledCount}/${daysInMonth} 日 記入あり`;
+  }
+
+  // ===== reset =====
   resetMonthBtn.addEventListener("click", () => {
     state = {};
     saveState();
     selectedDate = null;
     hidePicker();
     diaryEl.classList.remove("show");
+    listEl.classList.remove("show");
+    viewMode = "calendar";
     renderCalendar();
   });
 
@@ -771,12 +1086,11 @@
     if (!selectedDate) return;
     delete state[selectedDate];
     saveState();
-    // 開いたまま初期化して表示
-    openDiary(selectedDate);
+    openDiary(selectedDate); // 初期化して表示
     renderCalendar();
   });
 
-  // ===== 初期描画 =====
+  // ===== init =====
   renderCalendar();
 })();
 </script>
