@@ -258,4 +258,385 @@
     .todoRow input[type="checkbox"]{
       width: 18px;
       height: 18px;
-      accent-color: rgba
+      accent-color: rgba(255,255,255,.65);
+    }
+    .todoRow input.todoText{
+      flex:1;
+      padding: 10px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
+      color: var(--text);
+      outline: none;
+      font-size: 14px;
+    }
+
+    textarea.notes{
+      width: 100%;
+      min-height: 200px; /* 10行くらいの気分 */
+      padding: 12px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
+      color: var(--text);
+      outline: none;
+      resize: vertical;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    footer{
+      color: var(--muted);
+      font-size: 12px;
+      padding-top: 14px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 360px){
+      .cell{ height: 58px; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="titleRow">
+      <div>
+        <h1>2026年1月</h1>
+        <div class="sub">丸タップで色選択 / 日付タップで日記</div>
+      </div>
+      <div class="bar">
+        <button class="small" id="clearBtn" type="button">今月をリセット</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="dow">
+    <div>日</div><div>月</div><div>火</div><div>水</div><div>木</div><div>金</div><div>土</div>
+  </div>
+
+  <section class="grid" aria-label="2026年1月カレンダー">
+    <div class="days" id="days"></div>
+  </section>
+
+  <!-- 日記パネル -->
+  <section class="diary" id="diary">
+    <div class="diaryHead">
+      <div>
+        <div class="diaryTitle">日記</div>
+        <div class="diaryDate" id="diaryDate">----</div>
+      </div>
+      <button class="small" id="clearDayBtn" type="button">この日を消す</button>
+    </div>
+
+    <div class="field">
+      <div class="label">① 今日の目標（1行）</div>
+      <input class="goal" id="goalInput" type="text" placeholder="例：ラフを1枚描く" />
+    </div>
+
+    <div class="field">
+      <div class="label">② TODO（3行）</div>
+      <div class="todoRow">
+        <input type="checkbox" id="todo0chk" />
+        <input class="todoText" id="todo0txt" type="text" placeholder="TODO 1" />
+      </div>
+      <div class="todoRow">
+        <input type="checkbox" id="todo1chk" />
+        <input class="todoText" id="todo1txt" type="text" placeholder="TODO 2" />
+      </div>
+      <div class="todoRow">
+        <input type="checkbox" id="todo2chk" />
+        <input class="todoText" id="todo2txt" type="text" placeholder="TODO 3" />
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="label">③ 自由記載（10行くらい）</div>
+      <textarea class="notes" id="notesInput" placeholder="今日のこと、メモ、気づき…"></textarea>
+    </div>
+  </section>
+
+  <footer>
+    保存はこの端末内（ブラウザ）だけ。次で同期もできる。
+  </footer>
+</main>
+
+<!-- フローティング色ピッカー（1個だけ使い回す） -->
+<div class="pickerFloat" id="pickerFloat" role="dialog" aria-label="色を選ぶ">
+  <button class="pick pink" data-color="pink" type="button" aria-label="ピンク"></button>
+  <button class="pick yellow" data-color="yellow" type="button" aria-label="きいろ"></button>
+  <button class="pick blue" data-color="blue" type="button" aria-label="みずいろ"></button>
+</div>
+<div class="pickerCaret" id="pickerCaret"></div>
+
+<script>
+(() => {
+  // ====== 設定 ======
+  const YEAR = 2026;
+  const MONTH = 1; // 1-12
+  const STORAGE_KEY = `sticker-cal:${YEAR}-${String(MONTH).padStart(2,'0')}`;
+  const COLORS = ["pink", "yellow", "blue"];
+  // ====== ここまで ======
+
+  const daysEl = document.getElementById("days");
+  const clearBtn = document.getElementById("clearBtn");
+
+  const diaryEl = document.getElementById("diary");
+  const diaryDateEl = document.getElementById("diaryDate");
+  const clearDayBtn = document.getElementById("clearDayBtn");
+
+  const goalInput = document.getElementById("goalInput");
+  const notesInput = document.getElementById("notesInput");
+  const todoChk = [0,1,2].map(i => document.getElementById(`todo${i}chk`));
+  const todoTxt = [0,1,2].map(i => document.getElementById(`todo${i}txt`));
+
+  const pickerFloat = document.getElementById("pickerFloat");
+  const pickerCaret = document.getElementById("pickerCaret");
+
+  // state: { "YYYY-MM-DD": { color?: "pink"|"yellow"|"blue", goal:"", todos:[{done,bool,text}], notes:"" } }
+  function loadState(){
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); }
+    catch { return {}; }
+  }
+  function saveState(state){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+  let state = loadState();
+
+  const first = new Date(YEAR, MONTH - 1, 1);
+  const last = new Date(YEAR, MONTH, 0);
+  const firstDow = first.getDay(); // 0=Sun
+  const daysInMonth = last.getDate();
+  const totalCells = 42;
+
+  let selectedDate = null; // "YYYY-MM-DD"
+  let pickerForDate = null; // "YYYY-MM-DD"
+
+  function ymd(day){
+    return `${YEAR}-${String(MONTH).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+  }
+  function ensureDayObj(key){
+    if (!state[key]) {
+      state[key] = {
+        color: undefined,
+        goal: "",
+        todos: [
+          { done:false, text:"" },
+          { done:false, text:"" },
+          { done:false, text:"" },
+        ],
+        notes: ""
+      };
+    } else {
+      // 古いデータ互換
+      state[key].todos ||= [
+        { done:false, text:"" },
+        { done:false, text:"" },
+        { done:false, text:"" },
+      ];
+      for (let i=0;i<3;i++){
+        state[key].todos[i] ||= { done:false, text:"" };
+      }
+      state[key].goal ||= "";
+      state[key].notes ||= "";
+    }
+  }
+
+  function hidePicker(){
+    pickerFloat.classList.remove("show");
+    pickerCaret.classList.remove("show");
+    pickerForDate = null;
+  }
+
+  // 画面タップでピッカー閉じる（ピッカー内部は除外）
+  document.addEventListener("pointerdown", (e) => {
+    const inPicker = e.target.closest("#pickerFloat");
+    const isDot = e.target.closest(".dot");
+    if (!inPicker && !isDot) hidePicker();
+  });
+
+  // ピッカーの位置決め（dotの上に出す）
+  function showPickerNear(dotEl, dateKey){
+    pickerForDate = dateKey;
+
+    const r = dotEl.getBoundingClientRect();
+    // ピッカーサイズ見積もり（表示してから計測）
+    pickerFloat.classList.add("show");
+    pickerCaret.classList.add("show");
+
+    const pr = pickerFloat.getBoundingClientRect();
+    const caretSize = 10;
+
+    // dotの上に配置（画面外なら左右調整）
+    let left = r.left + (r.width/2) - (pr.width/2);
+    left = Math.max(8, Math.min(left, window.innerWidth - pr.width - 8));
+
+    let top = r.top - pr.height - 12; // 上に
+    let caretTop = r.top - (caretSize/2) - 6;
+
+    // 上が足りないなら下に出す
+    if (top < 8){
+      top = r.bottom + 12;
+      caretTop = r.bottom + 6;
+      // caretは下向きっぽく見せたいので回転はそのままでもOK（雰囲気優先）
+    }
+
+    pickerFloat.style.left = `${left}px`;
+    pickerFloat.style.top = `${top}px`;
+
+    const caretLeft = r.left + (r.width/2) - (caretSize/2);
+    pickerCaret.style.left = `${caretLeft}px`;
+    pickerCaret.style.top = `${caretTop}px`;
+  }
+
+  function setSelectedDate(key){
+    selectedDate = key;
+    ensureDayObj(key);
+    saveState(state); // 生成したら保存
+
+    // UI反映
+    diaryEl.classList.add("show");
+    diaryDateEl.textContent = key;
+
+    const d = state[key];
+    goalInput.value = d.goal || "";
+    notesInput.value = d.notes || "";
+    for (let i=0;i<3;i++){
+      todoChk[i].checked = !!d.todos[i].done;
+      todoTxt[i].value = d.todos[i].text || "";
+    }
+
+    render(); // selected枠更新
+  }
+
+  // 日記入力は全部「入力のたびに保存」でいい（試作はこれが強い）
+  function bindDiaryAutosave(){
+    function saveFromUI(){
+      if (!selectedDate) return;
+      ensureDayObj(selectedDate);
+      const d = state[selectedDate];
+
+      d.goal = goalInput.value || "";
+      d.notes = notesInput.value || "";
+      for (let i=0;i<3;i++){
+        d.todos[i].done = !!todoChk[i].checked;
+        d.todos[i].text = todoTxt[i].value || "";
+      }
+      saveState(state);
+    }
+
+    goalInput.addEventListener("input", saveFromUI);
+    notesInput.addEventListener("input", saveFromUI);
+    for (let i=0;i<3;i++){
+      todoChk[i].addEventListener("change", saveFromUI);
+      todoTxt[i].addEventListener("input", saveFromUI);
+    }
+  }
+
+  function render(){
+    daysEl.innerHTML = "";
+
+    for (let i=0; i<totalCells; i++){
+      const day = i - firstDow + 1;
+      const isInMonth = day >= 1 && day <= daysInMonth;
+
+      const cell = document.createElement("div");
+      cell.className = "cell" + (isInMonth ? "" : " is-empty");
+      cell.setAttribute("role", "gridcell");
+
+      const daynum = document.createElement("div");
+      daynum.className = "daynum";
+      daynum.textContent = isInMonth ? String(day) : "";
+      cell.appendChild(daynum);
+
+      if (isInMonth){
+        const key = ymd(day);
+        if (key === selectedDate) cell.classList.add("selected");
+
+        // 日付セルタップ → 日記を開く（dotは別）
+        cell.addEventListener("click", () => {
+          hidePicker();
+          setSelectedDate(key);
+        });
+
+        // スタンプ丸
+        const dot = document.createElement("button");
+        dot.type = "button";
+        dot.className = "dot";
+        dot.setAttribute("aria-label", `${YEAR}年${MONTH}月${day}日 スタンプ`);
+
+        ensureDayObj(key);
+        const color = state[key].color;
+        if (COLORS.includes(color)){
+          dot.classList.add("filled", color);
+        }
+
+        // dotタップは「セル選択」させず、ピッカーを出す
+        dot.addEventListener("click", (e) => {
+          e.stopPropagation();
+          // 同じ日ならトグル（開いてたら閉じる）
+          if (pickerFloat.classList.contains("show") && pickerForDate === key){
+            hidePicker();
+            return;
+          }
+          showPickerNear(dot, key);
+        });
+
+        cell.appendChild(dot);
+      }
+
+      daysEl.appendChild(cell);
+    }
+  }
+
+  // ピッカーの色選択
+  pickerFloat.addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-color]");
+    if (!b || !pickerForDate) return;
+
+    const color = b.getAttribute("data-color");
+    ensureDayObj(pickerForDate);
+
+    // 同じ色なら消す（空白へ戻す）
+    if (state[pickerForDate].color === color) {
+      state[pickerForDate].color = undefined;
+    } else {
+      state[pickerForDate].color = color;
+    }
+
+    saveState(state);
+    hidePicker();
+    render();
+  });
+
+  clearBtn.addEventListener("click", () => {
+    state = {};
+    saveState(state);
+    selectedDate = null;
+    hidePicker();
+    diaryEl.classList.remove("show");
+    render();
+  });
+
+  clearDayBtn.addEventListener("click", () => {
+    if (!selectedDate) return;
+    delete state[selectedDate];
+    saveState(state);
+    // 画面はクリア状態を表示
+    ensureDayObj(selectedDate); // 空で作り直して表示（「日記枠はある」思想）
+    saveState(state);
+    setSelectedDate(selectedDate);
+    render();
+  });
+
+  // 初期描画
+  render();
+  bindDiaryAutosave();
+
+  // ついで：最初に1日を選ばず、触った日に出る仕様（希望どおり）
+})();
+</script>
+</body>
+</html>
